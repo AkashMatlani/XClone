@@ -48,3 +48,10 @@ export const syncUser = asyncHanler(async (req, res) => {
 
   res.status(201).json({ user, message: "User Created successfully" });
 });
+
+export const getCurrentUser = asyncHanler(async (req, res) => {
+  const { userId } = getAuth(req);
+  const user = await User.findOne({ clerkId: userId });
+  if (!user) return res.status(404).json({ error: "User not found" });
+  res.status(200).json({ user });
+});

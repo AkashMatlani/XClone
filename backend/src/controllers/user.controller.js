@@ -1,6 +1,8 @@
 import asyncHanler from "express-async-handler";
 import User from "../models/user.model.js";
 import { clerkClient, getAuth } from "@clerk/express";
+import Notification from "../models/notification.model.js";
+
 export const getUserProfile = asyncHanler(async (req, res) => {
   const { userName } = req.params;
   const user = await User.findOne({ userName });
@@ -54,4 +56,55 @@ export const getCurrentUser = asyncHanler(async (req, res) => {
   const user = await User.findOne({ clerkId: userId });
   if (!user) return res.status(404).json({ error: "User not found" });
   res.status(200).json({ user });
+});
+
+export const followUser = asyncHanler(async (req, res) => {
+  const { userId } = getAuth(req);
+  const { targetedUserId } = req.params;
+
+  if (userId == targetedUserId)
+    return res.status(400).json({ error: "You can not follow yourself" });
+
+  const currentUser = await User.findOne({ clerkId: userId });
+  const targetUser = await User.findById({ targetedUserId });
+
+  if (!currentUser || !targetUser)
+    res.status(404).json({ error: "User not found" });
+
+  const isFollowing = currentUser.following.includes(targetedUserId);
+
+  if (isFollowing) {
+    //unfollow
+    await User.findByIdAndUpdate(currentUser._id, {
+      $pull: { following: targetedUserId },
+    });
+
+    await User.findByIdAndUpdate(targetedUserId, {
+      $pull: { followers: currentUser._id },
+    });
+  } else {
+    //follow
+    await User.findByIdAndUpdate(currentUser._id, {
+      $push: { following: targetedUserId },
+    });
+
+    await User.findByIdAndUpdate(targetedUserId, {
+      $push: { followers: currentUser._id },
+    });
+
+    //Create Notification
+    await Notification.create({
+      from: currentUser._id,
+      to: targetedUserId,
+      type: "follow",
+    });
+  }
+
+  res
+    .status(200)
+    .json({
+      message: isFollowing
+        ? "User unfollowed successfully"
+        : "User followed successfully",
+    });
 });

@@ -107,3 +107,47 @@ export const createPost = asyncHandler(async (req, res) => {
 
   res.status(201).json({ post });
 });
+
+export const likePost = asyncHandler(async (req, res) => {
+  const { userId } = getAuth(req);
+  const { postId } = req.params;
+
+  //fetch from database
+  const user = await User.findOne({ clerkId: userId });
+  const post = await Post.findById(postId);
+
+  if (!user || !post)
+    return res.status(404).json({ error: "User or Post not found" });
+
+  const isLiked = post.likes.includes(user._id);
+
+  if (isLiked) {
+    //unlike
+    await Post.findByIdAndUpdate(postId, {
+      $pull: { likes: user._id },
+    });
+  } else {
+    //like
+    await Post.findByIdAndUpdate(postId, {
+      $push: { likes: user._id },
+    });
+
+    //create notification if not liking own post
+    if (post.user.toString() != user._id.toString()) {
+      await Notification.create({
+        from: user._id,
+        to: post.user,
+        type: "like",
+        post: postId,
+      });
+    }
+  }
+
+  res
+    .status(200)
+    .json({
+      message: isLiked
+        ? "Post unlinked successfully"
+        : "Post liked successfully",
+    });
+});

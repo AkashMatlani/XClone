@@ -1,4 +1,4 @@
-import  aj  from "../config/arcjet.js";
+import aj from "../config/arcjet.js";
 
 //arcjet middleware for rate limiting, bot protection and security
 
@@ -40,9 +40,9 @@ export const arcjetMiddleware = async (req, res, next) => {
         error: "Spoofed bot detected",
         message: "Malicious bot activity detected.",
       });
-
-      next();
+      
     }
+    next();
   } catch (error) {
     console.error("Arcjet middleware error:", error);
     //allow request to continue if Arcjet fails

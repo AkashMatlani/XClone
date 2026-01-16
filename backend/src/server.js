@@ -42,13 +42,13 @@ const startServer = async () => {
   try {
     await connctDB();
 
-    //listen for local development
+    // //listen for local development
 
-    if (ENV.NODE_ENV !== "production") {
-      app.listen(ENV.PORT, "0.0.0.0", () =>
-          console.log(`Server running on http://localhost:${ENV.PORT}/`)
-      );
-    }
+    // if (ENV.NODE_ENV !== "production") {
+    //   app.listen(ENV.PORT, "0.0.0.0", () =>
+    //       console.log(`Server running on http://localhost:${ENV.PORT}/`)
+    //   );
+    // }
   } catch (error) {
     console.error("Failed to start server:", error.message);
     process.exit(1);

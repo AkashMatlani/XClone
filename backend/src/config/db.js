@@ -4,15 +4,16 @@ import { ENV } from "./env.js";
 let isConnected = false;
 
 export const connectDB = async () => {
-  if (isConnected) {
-    return;
-  }
+  if (isConnected) return; // Already connected
   try {
-    await mongoose.connect(ENV.MONGO_URI);
+    await mongoose.connect(ENV.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     isConnected = true;
-    console.log("Connected to DB successfully");
+    console.log("✅ Connected to MongoDB");
   } catch (err) {
-    console.error("DB connection error:", err);
-    throw err; // crash will happen if DB is unreachable
+    console.error("MongoDB connection error:", err);
+    throw err; // Crash if DB cannot connect
   }
 };

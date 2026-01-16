@@ -1,18 +1,19 @@
 {
-    "version": 2,
-    "builds": [
-        {
-            "src": "src/server.js",
-            "use": "@vercel/node"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "api/index.js"
-        }
-    ],
-    "env": {
-        "NODE_ENV": "production"
-    }
+  "version": 2,
+  "builds": [
+    { "src": "api/index.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "api/index.js" }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "MONGO_URI": "@MONGO_URI",
+    "ARCJET_KEY": "@ARCJET_KEY",
+    "CLERK_PUBLISHABLE_KEY": "@CLERK_PUBLISHABLE_KEY",
+    "CLERK_SECRET_KEY": "@CLERK_SECRET_KEY",
+    "CLOUDINARY_CLOUD_NAME": "@CLOUDINARY_CLOUD_NAME",
+    "CLOUDINARY_API_KEY": "@CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET": "@CLOUDINARY_API_SECRET"
+  }
 }

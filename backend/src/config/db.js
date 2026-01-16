@@ -1,13 +1,18 @@
 import mongoose from "mongoose";
 import { ENV } from "./env.js";
 
-export const connctDB = async () => {
-  try {
+let isConnected = false;
 
+export const connectDB = async () => {
+  if (isConnected) {
+    return;
+  }
+  try {
     await mongoose.connect(ENV.MONGO_URI);
-    console.log("Connected db successfully")
-  } catch (error) {
-    console.log("Error Connecting DB")
-    process.exit(1);
+    isConnected = true;
+    console.log("Connected to DB successfully");
+  } catch (err) {
+    console.error("DB connection error:", err);
+    throw err; // crash will happen if DB is unreachable
   }
 };

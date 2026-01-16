@@ -1,4 +1,4 @@
-import { aj } from "../config/arcjet.js";
+import  aj  from "../config/arcjet.js";
 
 //arcjet middleware for rate limiting, bot protection and security
 

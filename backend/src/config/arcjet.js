@@ -1,7 +1,6 @@
 import arcjet, {
   tokenBucket,
   shield,
-  deleteBot,
   detectBot,
 } from "@arcjet/node";
 import { ENV } from "./env.js";
@@ -14,12 +13,12 @@ export default arcjet({
   rules: [
     //shiled protects your app from common attacks e.g SQL injections,xss,CSRF attacks
 
-    shield({ mode: "Live" }),
+    shield({ mode: "LIVE" }),
 
     //bot detection -block all bots except search engines
 
     detectBot({
-      mode: "Live",
+      mode: "LIVE",
       allow: [
         "CATEGORY:SEARCH_ENGINE",
         //allow legitimate search engine bots

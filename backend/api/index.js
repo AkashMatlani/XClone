@@ -1,11 +1,11 @@
 import app from "../src/server.js";
-import { connctDB } from "../src/config/db.js";
+import { connectDB } from "../src/config/db.js";
 
 let dbPromise = null;
 
 export default async (req, res) => {
   try {
-    if (!dbPromise) dbPromise = connctDB(); // cache Mongo connection
+    if (!dbPromise) dbPromise = connectDB(); // cache Mongo connection
     await dbPromise;
 
     app(req, res);

@@ -32,8 +32,28 @@ export default function Index() {
               <Text className="text-black font-medium text-base">Continue with Google</Text>
             </View>
           </TouchableOpacity>
+           
+           {/* Apple Sign in Icon */}
+             <TouchableOpacity
+            className="flex-row items-center justify-center bg-white border border-gray-300  rounded-full py-3 px-6"
+            onPress={() => { }}
+            style={{
+              shadowColor: "#000",
+              shadowOffset:{width:0,height:1},
+              shadowOpacity:0.1,
+              shadowRadius:2,
+              elevation:2, //only in android
+            }}
+          >
+            <View className="flex-row items-center justify-center">
+              <Image source={require("../../assets/images/apple.png")}
+                className="size-8 mr-3"
+                resizeMode="contain"></Image>
 
-
+              <Text className="text-black font-medium text-base">Continue with Apple</Text>
+            </View>
+          </TouchableOpacity>
+          
         </View>
       </View>
     </View>

@@ -1,8 +1,9 @@
+import { useSocialAuth } from "@/hooks/useSocialAuth";
 import { Image, TouchableOpacity, View, Text, ActivityIndicator } from "react-native";
 
 export default function Index() {
 
-  const isLoading = false;
+  const { handleSocialAuth, isLoading } = useSocialAuth();
   return <View className="flex-1 bg-white">
     <View className="flex-1 px-8 justify-between">
       <View className="flex-1 justify-center">
@@ -17,7 +18,11 @@ export default function Index() {
           {/* Google button */}
           <TouchableOpacity
             className="flex-row items-center justify-center bg-white border border-gray-300  rounded-full py-3 px-6"
-            onPress={() => { }}
+            onPress={() => {
+              handleSocialAuth("oauth_google")
+
+            }}
+            disabled={isLoading}
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 1 },
@@ -40,7 +45,10 @@ export default function Index() {
           {/* Apple Sign in Icon */}
           <TouchableOpacity
             className="flex-row items-center justify-center bg-white border border-gray-300  rounded-full py-3 px-6"
-            onPress={() => { }}
+            onPress={() => {
+              handleSocialAuth("oauth_apple")
+            }}
+            disabled={isLoading}
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 1 },
@@ -66,11 +74,10 @@ export default function Index() {
         {/* Terms and Privacy */}
         <Text className="text-center text-gray-500 text-xs leading-4 mt-6 px-2">
           By signing up, you agree to our <Text className="text-blue-500">Terms</Text>
-          {","}
+          {", "}
           <Text className="text-blue-500">Privacy Policy</Text>
           {", and "}
           <Text className="text-blue-500">Cookie Use</Text>
-
         </Text>
       </View>
     </View>

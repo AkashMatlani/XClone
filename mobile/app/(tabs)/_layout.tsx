@@ -1,11 +1,28 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import { Tabs } from 'expo-router'
+import { Redirect, Tabs } from 'expo-router'
 import { Feather } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuth } from '@clerk/clerk-expo';
 
 const TabsLayout = () => {
+    const insets = useSafeAreaInsets();
+    const { isSignedIn } = useAuth();
+
+    if (!isSignedIn) return <Redirect href="/(auth)"></Redirect>
     return (
-        <Tabs>
+        <Tabs screenOptions={{
+            tabBarActiveTintColor: "#1DA1F2",
+            tabBarInactiveTintColor: "#657786",
+            tabBarStyle: {
+                backgroundColor: '#fff',
+                borderTopWidth: 1,
+                borderTopColor: '#E1E8ED',
+                height: 50 + insets.bottom,
+                paddingTop: 8
+            },
+            headerShown: false,
+        }}>
             <Tabs.Screen
                 name='index'
                 options={{

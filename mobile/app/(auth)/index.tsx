@@ -1,6 +1,7 @@
 import { useSocialAuth } from "@/hooks/useSocialAuth";
 import { Image, TouchableOpacity, View, Text, ActivityIndicator } from "react-native";
 
+//Login Page
 export default function Index() {
 
   const { handleSocialAuth, isLoading } = useSocialAuth();

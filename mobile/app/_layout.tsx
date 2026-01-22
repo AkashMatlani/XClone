@@ -5,8 +5,8 @@ import "../global.css"
 
 export default function RootLayout() {
   return <ClerkProvider tokenCache={tokenCache}>
-    <Stack> 
-      <Stack.Screen name='(auth)' options={{headerShown:false}}></Stack.Screen>
-  </Stack>
+    <Stack>
+      <Stack.Screen name='(auth)' options={{ headerShown: false }}></Stack.Screen>
+    </Stack>
   </ClerkProvider>
 }

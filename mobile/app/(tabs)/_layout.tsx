@@ -9,7 +9,7 @@ const TabsLayout = () => {
     const insets = useSafeAreaInsets();
     const { isSignedIn } = useAuth();
 
-    if (!isSignedIn) return <Redirect href="/(auth)"></Redirect>
+    if (!isSignedIn) return <Redirect href="/(auth)"/>
     return (
         <Tabs screenOptions={{
             tabBarActiveTintColor: "#1DA1F2",

@@ -1,7 +1,15 @@
 import aj from "../config/arcjet.js";
+import { getAuth } from "@clerk/express";
 
 export const arcjetMiddleware = async (req, res, next) => {
   try {
+    // Skip Arcjet for authenticated users
+    const { userId } = getAuth(req);
+    if (userId) {
+      console.log("✅ Authenticated user - skipping Arcjet");
+      return next();
+    }
+
     if (!aj) {
       console.warn("⚠️ Arcjet client not initialized!");
       return next();

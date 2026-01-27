@@ -1,5 +1,7 @@
 import { getAuth } from "@clerk/express";
 export const protectRoute = (req, res, next) => {
+    console.log("Auth object:", getAuth(req));
+
   const { userId } = getAuth(req);
   
   if (!userId) {

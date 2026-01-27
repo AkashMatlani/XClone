@@ -1,4 +1,4 @@
-import { Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { CONVERSATIONS, ConversationType } from '@/data/conversations';
@@ -51,7 +51,7 @@ const MessagesScreen = () => {
   };
 
   return (
-    <SafeAreaView className='flex-1 bg-white' >
+    <SafeAreaView className='flex-1 bg-white' edges={["top"]}>
       {/* Header Componenet */}
       <View className='flex-row items-center justify-between px-4 py-3 border-b border-gray-100'>
         <Text className='text-xl font-bold text-gray-900'>Messages</Text>
@@ -102,6 +102,38 @@ const MessagesScreen = () => {
           )
           )}
       </ScrollView>
+      {/* Quick action */}
+      <View className='px-4 py-2 border-t border-gray-100 bg-gray-50'>
+        <Text className='text-xs text-gray-500 text-center'>
+          Tap to open . Long press to delete
+        </Text>
+      </View>
+
+      <Modal visible={isChatOpen} animationType='slide' presentationStyle='pageSheet'>
+        {selectedConversation && (
+          <>
+            {/* Chat Header */}
+            <View className='flex-row items-center px-4 py-3 border-b border-gray-100'>
+              <TouchableOpacity onPress={closeChatModel} className='mr-3'>
+                <Feather name='arrow-left' size={24} color='#1DA1F2'>
+                </Feather>
+              </TouchableOpacity>
+
+              <Image source={{ uri: selectedConversation.user.avatar }} className='size-10 rounded-full mr-3'>
+              </Image>
+              <View className='flex-1'>
+                <View className='flex-row items-center'>
+                  <Text className='font-semibold text-gray-900 mr-1'>
+                    {selectedConversation.user.name}
+                  </Text>
+                  {selectedConversation.user.verified && (<Feather name='check-circle' size={16} color='#1DA1F2'/>)}
+                </View>
+                <Text className='text-gray-500 text-sm'>@{selectedConversation.user.username}</Text>
+              </View>
+            </View>
+          </>
+        )}
+      </Modal>
 
     </SafeAreaView>
   )

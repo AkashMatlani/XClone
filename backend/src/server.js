@@ -2,7 +2,6 @@ import express from "express";
 import { connectDB } from "./config/db.js";
 import cors from "cors";
 import { clerkMiddleware } from "@clerk/express";
-
 import { arcjetMiddleware } from "./middleware/arcjet.middleware.js";
 
 import userRoutes from "./routes/user.route.js";

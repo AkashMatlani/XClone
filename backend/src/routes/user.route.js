@@ -16,10 +16,10 @@ router.get("/profile/:userName", getUserProfile);
 //protected route
 
 //follow User
-router.post("/follow/targetUserId", protectRoute, followUser);
+router.post("/follow/:targetUserId", protectRoute, followUser);
 
 //Current User Data
-router.post("/me", protectRoute, getCurrentUser);
+router.get("/me", protectRoute, getCurrentUser);
 
 //saving data to DB
 router.post("/sync", protectRoute, syncUser);

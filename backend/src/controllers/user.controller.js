@@ -66,7 +66,7 @@ export const followUser = asyncHanler(async (req, res) => {
     return res.status(400).json({ error: "You can not follow yourself" });
 
   const currentUser = await User.findOne({ clerkId: userId });
-  const targetUser = await User.findById({ targetedUserId });
+  const targetUser = await User.findById(targetedUserId);
 
   if (!currentUser || !targetUser)
     res.status(404).json({ error: "User not found" });

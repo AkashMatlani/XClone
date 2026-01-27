@@ -126,16 +126,48 @@ const MessagesScreen = () => {
                   <Text className='font-semibold text-gray-900 mr-1'>
                     {selectedConversation.user.name}
                   </Text>
-                  {selectedConversation.user.verified && (<Feather name='check-circle' size={16} color='#1DA1F2'/>)}
+                  {selectedConversation.user.verified && (<Feather name='check-circle' size={16} color='#1DA1F2' />)}
                 </View>
                 <Text className='text-gray-500 text-sm'>@{selectedConversation.user.username}</Text>
               </View>
             </View>
+
+            {/* Chat Message Area */}
+            <ScrollView className='flex-1 px-4 py-4'>
+              <View className='mb-4'>
+                <Text className='text-center text-gray-400 text-sm  mb-4'>This is the beginning of your conversation with
+                  {selectedConversation.user.name}
+                </Text>
+                {/* Conversation Messages */}
+                {selectedConversation.messages.map((message) => (
+                  <View key={message.id}
+                    className={`flex-row mb-3 ${message.fromUser ? "justify-end" : ""}`}
+                  >
+                    {!message.fromUser && (
+                      <Image source={{ uri: selectedConversation.user.avatar }}
+                        className='size-8 rounded-full mr-2'>
+                      </Image>
+                    )}
+                    <View className={`flex-1 ${message.fromUser ? "items-end" : ""}`}>
+                      <View className={`rounded-2xl px-4 py-3 max-w-xs ${message.fromUser ? "bg-blue-500" : "bg-gray-100"}`}
+                      >
+
+                        <Text className={message.fromUser ? "text-white" : "text-gray-900"}>
+                          {message.text}
+                        </Text>
+                      </View>
+                      <Text className='text-xs text-gray-400 mt-1'>{message.time}</Text>
+                    </View>
+                  </View>
+                ))}
+
+              </View>
+            </ScrollView>
           </>
         )}
       </Modal>
 
-    </SafeAreaView>
+    </SafeAreaView >
   )
 }
 

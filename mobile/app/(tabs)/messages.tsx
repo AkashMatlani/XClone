@@ -111,7 +111,7 @@ const MessagesScreen = () => {
 
       <Modal visible={isChatOpen} animationType='slide' presentationStyle='pageSheet'>
         {selectedConversation && (
-          <>
+          <SafeAreaView className='flex-1'>
             {/* Chat Header */}
             <View className='flex-row items-center px-4 py-3 border-b border-gray-100'>
               <TouchableOpacity onPress={closeChatModel} className='mr-3'>
@@ -163,10 +163,30 @@ const MessagesScreen = () => {
 
               </View>
             </ScrollView>
-          </>
+
+            {/* Message Input */}
+            <View className='flex-row items-center px-4 py-3 border-t border-gray-100'>
+              <View className='flex-1 flex-row items-center bg-gray-100 rounded-full px-4 py-3 mr-3'>
+                <TextInput className='flex-1 text-base'
+                  placeholder='Start a Message...'
+                  placeholderTextColor="#657786"
+                  value={newMessage}
+                  onChangeText={setNewMessage}
+                  multiline>
+                </TextInput>
+              </View>
+              <TouchableOpacity
+                onPress={sendMessage}
+                className={`size-10 rounded-full items-center justify-center ${newMessage.trim() ? "bg-blue-500" : "bg-gray-300"}`}
+                disabled={!newMessage.trim}
+              >
+                <Feather name='send' size={20} color="white">
+                </Feather>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
         )}
       </Modal>
-
     </SafeAreaView >
   )
 }

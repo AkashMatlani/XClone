@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -6,7 +6,7 @@ import { useApiClient } from "@/utils/api";
 
 export const useCreatePost = () => {
     const [content, setContent] = useState('');
-    const [seletedImages, setSelectedImages] = useState<string[]>([]);
+    const [seletedImages, setSelectedImages] = useState<string| null>(null);
     const apiClient = useApiClient();
     const queryClient = useQueryClient();
 
@@ -39,13 +39,12 @@ export const useCreatePost = () => {
                     'Content-Type': 'multipart/form-data',
                 }
             });
-
         },
         onSuccess: () => {
             //refresh posts list
             queryClient.invalidateQueries({ queryKey: ['posts'] });
             setContent('');
-            setSelectedImages([]);
+            setSelectedImages(null);
             Alert.alert('Success', 'Post created successfully!');
         },
         onError: (error) => {
@@ -53,17 +52,32 @@ export const useCreatePost = () => {
         }
     });
 
-    const pickImageFromGallery = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsMultipleSelection: true,
-            selectionLimit: 4,
-        });
+    const handleImagePicker = async (useCamera: boolean = false) => {
+        const permissionResult = useCamera
+            ? await ImagePicker.requestCameraPermissionsAsync()
+            : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-        if (!result.canceled && result.assets) {
-            const imageUris = result.assets.map(asset => asset.uri);
-            setSelectedImages(prev => [...prev, ...imageUris]);
+
+        if (permissionResult.status !== 'granted') {
+            const source = useCamera ? 'camera' : 'photo gallery';
+
+            Alert.alert('Permission needed', `please grant permission to access your ${source}`);
+            return;
         }
+
+        const pickerOption = {
+            alloEditing: true,
+            aspect: [16, 9] as [number, number],
+            quality: 0.8,
+        }
+
+        const result = useCamera
+            ? await ImagePicker.launchCameraAsync(pickerOption)
+            : await ImagePicker.launchImageLibraryAsync({
+                ...pickerOption, mediaTypes: ["images"]
+            });
+
+        if (!result.canceled) setSelectedImages(result.assets[0].uri);
     };
 
     const takePhoto = async () => {

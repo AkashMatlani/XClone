@@ -6,12 +6,12 @@ import { useApiClient } from "@/utils/api";
 
 export const useCreatePost = () => {
     const [content, setContent] = useState('');
-    const [seletedImages, setSelectedImages] = useState<string| null>(null);
+    const [seletedImages, setSelectedImages] = useState<string | null>(null);
     const apiClient = useApiClient();
     const queryClient = useQueryClient();
 
 
-    const createPost = useMutation({
+    const createPostMutation = useMutation({
         mutationFn: async (postData: { content: string; imageUri?: string }) => {
             const formData = new FormData();
             if (postData.content) formData.append('content', content);
@@ -57,10 +57,8 @@ export const useCreatePost = () => {
             ? await ImagePicker.requestCameraPermissionsAsync()
             : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-
         if (permissionResult.status !== 'granted') {
             const source = useCamera ? 'camera' : 'photo gallery';
-
             Alert.alert('Permission needed', `please grant permission to access your ${source}`);
             return;
         }
@@ -80,28 +78,30 @@ export const useCreatePost = () => {
         if (!result.canceled) setSelectedImages(result.assets[0].uri);
     };
 
-    const takePhoto = async () => {
-        const result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        });
 
-        if (!result.canceled && result.assets) {
-            setSelectedImages(prev => [...prev, result.assets[0].uri]);
+    const createPost = () => {
+        if (!content.trim() && !seletedImages) {
+            Alert.alert("Empty Post", "Please write something or add an image before posting!");
+            return;
         }
-    };
 
-    const removeImage = (uriToRemove: string) => {
-        setSelectedImages(prev => prev.filter(uri => uri !== uriToRemove));
-    };
+        const postData: { content: string; imageUri?: string } = {
+            content: content.trim(),
+        };
+
+        if (seletedImages) postData.imageUri = seletedImages;
+        createPostMutation.mutate(postData);
+
+    }
 
     return {
         content,
         setContent,
         seletedImages,
-        isCreating: createPost.isLoading,
-        pickImageFromGallery,
-        takePhoto,
-        removeImage,
-        createPost
+        isCreating: createPostMutation.isPending,
+        pickImageFromGallery: () => handleImagePicker(false),
+        takePhoto:() =>handleImagePicker(true),
+        removeImage:()=>setSelectedImages(null),
+        createPost,
     };
 }

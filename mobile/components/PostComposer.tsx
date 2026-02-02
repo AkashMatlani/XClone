@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { Feather, Ionicons } from '@expo/vector-icons'
 import { useUser } from '@clerk/clerk-expo'
@@ -56,9 +56,31 @@ const PostComposer = () => {
                     </TouchableOpacity>
                     <TouchableOpacity className='mr-4' onPress={takePhoto}>
                         <Feather name='camera' size={20} color='#1DA1F2' />
-                        </TouchableOpacity>
-                        </View>
+                    </TouchableOpacity>
                 </View>
+                <View className='flex-row items-center'>
+                    {content.length > 0 && (
+                        <Text className={`text-sm mr-3 ${content.length > 260 ? "text-red-500" : "text-gray-500"}`}
+                        >
+                            {280 - content.length}
+                        </Text>
+                    )}
+
+                    <TouchableOpacity className={`px-6 py-2 rounded-full ${content.trim() || seletedImages ? "bg-blue-500" : "bg-gray-500"}`}
+                        onPress={createPost}
+                        disabled={isCreating || (!content.trim() && !seletedImages)}
+                    >
+
+                        {isCreating ? <ActivityIndicator size='small' color='white' />
+                            : <Text className={'font-semibold ${content.trim() || seletedImages? "text-white" : text-gray-500}'}
+                            >
+                            Post
+                            </Text>
+                            }
+
+                    </TouchableOpacity>
+                </View>
+            </View>
         </View>
     )
 }

@@ -10,7 +10,6 @@ export const useCreatePost = () => {
     const apiClient = useApiClient();
     const queryClient = useQueryClient();
 
-
     const createPostMutation = useMutation({
         mutationFn: async (postData: { content: string; imageUri?: string }) => {
             const formData = new FormData();

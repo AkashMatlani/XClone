@@ -28,6 +28,14 @@ const PostsList = () => {
         );
     }
 
+    if (posts && posts.length === 0) {
+        return (
+            <View className='p-8 items-center'>
+                <Text className='text-gray-500'>No posts yet</Text>
+            </View>
+        );
+    }
+
     return (
         <View>
             <Text>PostsList</Text>

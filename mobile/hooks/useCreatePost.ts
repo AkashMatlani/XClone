@@ -2,18 +2,18 @@ import { use, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { useApiClient } from "@/utils/api";
+import { useApiClient } from "../utils/api";
 
 export const useCreatePost = () => {
     const [content, setContent] = useState('');
     const [seletedImages, setSelectedImages] = useState<string | null>(null);
-    const apiClient = useApiClient();
+    const api = useApiClient();
     const queryClient = useQueryClient();
 
     const createPostMutation = useMutation({
         mutationFn: async (postData: { content: string; imageUri?: string }) => {
             const formData = new FormData();
-            if (postData.content) formData.append('content', content);
+            if (postData.content) formData.append('content', postData.content);
             if (postData.imageUri) {
 
                 const uriParts = postData.imageUri.split('.');
@@ -33,7 +33,7 @@ export const useCreatePost = () => {
                 } as any);
             }
 
-            return apiClient.post('/posts', formData, {
+            return api.post('/posts', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
@@ -46,7 +46,10 @@ export const useCreatePost = () => {
             setSelectedImages(null);
             Alert.alert('Success', 'Post created successfully!');
         },
-        onError: (error) => {
+        onError: (error: any) => {
+            console.log('POST ERROR:', error);
+            console.log('STATUS:', error?.response?.status);
+            console.log('DATA:', error?.response?.data);
             Alert.alert('Error', "Failed to create post.please try again.");
         }
     });
@@ -74,7 +77,12 @@ export const useCreatePost = () => {
                 ...pickerOption, mediaTypes: ["images"]
             });
 
-        if (!result.canceled) setSelectedImages(result.assets[0].uri);
+        if (!result.canceled) {
+            const asset = result.assets![0]; // non-null assertion
+            console.log('Image selected asset:', asset);
+            setSelectedImages(asset.uri);
+        }
+
     };
 
 
@@ -99,8 +107,8 @@ export const useCreatePost = () => {
         seletedImages,
         isCreating: createPostMutation.isPending,
         pickImageFromGallery: () => handleImagePicker(false),
-        takePhoto:() =>handleImagePicker(true),
-        removeImage:()=>setSelectedImages(null),
+        takePhoto: () => handleImagePicker(true),
+        removeImage: () => setSelectedImages(null),
         createPost,
     };
 }

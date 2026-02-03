@@ -75,8 +75,7 @@ const PostComposer = () => {
                             : <Text className={'font-semibold ${content.trim() || seletedImages? "text-white" : text-gray-500}'}
                             >
                             Post
-                            </Text>
-                            }
+                            </Text>}
 
                     </TouchableOpacity>
                 </View>

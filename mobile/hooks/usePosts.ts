@@ -33,7 +33,7 @@ export const usePosts = () => {
         }
     });
 
-    const checkIsLiked = (postLikes: string, currentUser: any) => {
+    const checkIsLiked = (postLikes: string[], currentUser: any) => {
         const isLiked = currentUser && postLikes.includes(currentUser._id);
         return isLiked;
     };

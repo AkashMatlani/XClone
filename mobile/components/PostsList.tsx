@@ -2,7 +2,8 @@ import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { usePosts } from '@/hooks/usePosts';
-
+import PostCard from './PostCard';
+import { Post } from '../types';
 const PostsList = () => {
 
     const { currentUser } = useCurrentUser();
@@ -37,9 +38,20 @@ const PostsList = () => {
     }
 
     return (
-        <View>
-            <Text>PostsList</Text>
-        </View>
+        //fragment
+        <>
+            {posts.map((post:Post) => (
+                <PostCard
+                    key={post._id}
+                    post={post}
+                    onLike={toggleLike}
+                    onDelete={deletePost}
+                    currentUser={currentUser}
+                    isLiked={checkIsLiked(post?.likes, currentUser)}
+
+                />
+            ))}
+       </>
     )
 }
 

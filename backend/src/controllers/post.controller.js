@@ -10,12 +10,12 @@ import cloudinary from "../config/cloudinray.js";
 export const getPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find()
     .sort({ createdAt: -1 })
-    .populate("user", "username firstname lastname profilepicture")
+    .populate("user", "username firstName lastName profilePicture")
     .populate({
       path: "comments",
       populate: {
         path: "user",
-        select: "username firstname lastname profilepicture",
+        select: "username firstName lastName profilePicture",
       },
     });
 
@@ -26,12 +26,12 @@ export const getPost = asyncHandler(async (req, res) => {
   const { postId } = req.params;
 
   const post = await Post.findById(postId)
-    .populate("user", "username firstname lastname profilepicture")
+    .populate("user", "username firstName lastName profilePicture")
     .populate({
       path: "comments",
       populate: {
         path: "user",
-        select: "username firstname lastname profilepicture",
+        select: "username firstName lastName profilePicture",
       },
     });
 
@@ -48,12 +48,12 @@ export const getUserPosts = asyncHandler(async (req, res) => {
 
   const posts = await Post.find({ user: user._id })
     .sort({ createdAt: -1 })
-    .populate("user", "username firstname lastname profilepicture")
+    .populate("user", "username firstName lastName profilePicture")
     .populate({
       path: "comments",
       populate: {
         path: "user",
-        select: "username firstname lastname profilepicture",
+        select: "username firstName lastName profilePicture",
       },
     });
   res.status(200).json({ posts });

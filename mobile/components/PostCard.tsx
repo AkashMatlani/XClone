@@ -1,8 +1,8 @@
 import { View, Text, Alert, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Post, User } from '../types';
-import { formatDate } from '@/utils/formatters';
-import { Feather } from '@expo/vector-icons';
+import { formatDate, formatNumber } from '@/utils/formatters';
+import { AntDesign, Feather } from '@expo/vector-icons';
 
 interface PostCardProps {
     post: Post;
@@ -56,14 +56,40 @@ const PostCard = ({ post, onLike, onDelete, currentUser, isLiked }:
                             {post.content}
                         </Text>
                     )}
-                      {post.image && (
-                    <Image source={{ uri: post.image }}
-                        className='w-full h-48 rounded-2xl mb-3'
-                        resizeMode='cover'
-                    />
-                )}
+                    {post.image && (
+                        <Image source={{ uri: post.image }}
+                            className='w-full h-48 rounded-2xl mb-3'
+                            resizeMode='cover'
+                        />
+                    )}
+
+                    <View className='flex-row justify-between max-w-xs'>
+                        <TouchableOpacity onPress={() => onLike(post._id)}
+                            className='flex-row items-center mr-6'>
+                            <Feather name="message-circle" size={18} color="#657786" />
+                            <Text className="text-gray-500 text-sm ml-2">{formatNumber(post.comments?.length || 0)}</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity className='flex-row items-center'>
+                            <Feather name='repeat' size={18} color="#657786" />
+                            <Text className='text-gray-500 text-sm ml-2'>0</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity className='flex-row items-center' onPress={()=> onLike(post._id)}>
+                            {isLiked?(<AntDesign name='heart' size={18} color="#E02424" />)
+                            :(<Feather name='heart' size={18} color="#657786" />
+
+                            )}
+                            <Text className={`text-sm ml-2 ${isLiked ? 'text-red-500' : 'text-gray-500'}`}>
+                                {formatNumber(post.likes?.length || 0)}
+                                </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Feather name='share' size={18} color="#657786" />
+                        </TouchableOpacity>
+                    </View>
                 </View>
-              
+
             </View>
         </View>
     )

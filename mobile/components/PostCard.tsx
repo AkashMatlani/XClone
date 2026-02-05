@@ -51,12 +51,19 @@ const PostCard = ({ post, onLike, onDelete, currentUser, isLiked }:
                                 <Feather name='trash-2' size={20} color='#657786' />
                             </TouchableOpacity>)}
                     </View>
-                    {post.content ? (
+                    {post.content && (
                         <Text className='text-gray-900 text-base  leading-5 mb-3'>
                             {post.content}
                         </Text>
-                    ) : null}
+                    )}
+                      {post.image && (
+                    <Image source={{ uri: post.image }}
+                        className='w-full h-48 rounded-2xl mb-3'
+                        resizeMode='cover'
+                    />
+                )}
                 </View>
+              
             </View>
         </View>
     )

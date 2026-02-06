@@ -4,13 +4,14 @@ import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { usePosts } from '@/hooks/usePosts';
 import PostCard from './PostCard';
 import { Post } from '../types';
+import CommentsModal from './CommentsModal';
 const PostsList = () => {
 
     const { currentUser } = useCurrentUser();
     const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts();
-    const [selectedPostId, setSelectedPostId] = useState<string | null>(null); 
+    const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
-    const seletedPost =selectedPostId ? posts.find((post: Post) => post._id === selectedPostId) : null;
+    const seletedPost = selectedPostId ? posts.find((post: Post) => post._id === selectedPostId) : null;
 
     if (isLoading) {
         return (
@@ -43,19 +44,21 @@ const PostsList = () => {
     return (
         //fragment
         <>
-            {posts.map((post:Post) => (
+            {posts.map((post: Post) => (
                 <PostCard
                     key={post._id}
                     post={post}
                     onLike={toggleLike}
                     onDelete={deletePost}
-                    onComment={(post: Post) => setSelectedPostId(post._id)}   
+                    onComment={(post: Post) => setSelectedPostId(post._id)}
                     currentUser={currentUser}
                     isLiked={checkIsLiked(post?.likes, currentUser)}
 
                 />
             ))}
-       </>
+
+            <CommentsModal seletedPost={seletedPost} onClose={() => setSelectedPostId(null)} />
+        </>
     )
 }
 

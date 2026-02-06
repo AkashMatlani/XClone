@@ -1,5 +1,5 @@
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { usePosts } from '@/hooks/usePosts';
 import PostCard from './PostCard';
@@ -8,6 +8,9 @@ const PostsList = () => {
 
     const { currentUser } = useCurrentUser();
     const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts();
+    const [selectedPostId, setSelectedPostId] = useState<string | null>(null); 
+
+    const seletedPost =selectedPostId ? posts.find((post: Post) => post._id === selectedPostId) : null;
 
     if (isLoading) {
         return (
@@ -46,6 +49,7 @@ const PostsList = () => {
                     post={post}
                     onLike={toggleLike}
                     onDelete={deletePost}
+                    onComment={(post: Post) => setSelectedPostId(post._id)}   
                     currentUser={currentUser}
                     isLiked={checkIsLiked(post?.likes, currentUser)}
 

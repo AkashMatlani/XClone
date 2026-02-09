@@ -11,7 +11,7 @@ import { updateProfile } from "../controllers/user.controller.js";
 const router = express.Router();
 
 //public route
-router.get("/profile/:userName", getUserProfile);
+router.get("/profile/:username", getUserProfile);
 
 //protected route
 

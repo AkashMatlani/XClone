@@ -4,8 +4,8 @@ import { clerkClient, getAuth } from "@clerk/express";
 import Notification from "../models/notification.model.js";
 
 export const getUserProfile = asyncHanler(async (req, res) => {
-  const { userName } = req.params;
-  const user = await User.findOne({ userName });
+  const { username } = req.params;
+  const user = await User.findOne({ username });
   if (!user) return res.status(404).json({ error: "User not found" });
 
   res.status(200).json({ user });
@@ -42,7 +42,7 @@ export const syncUser = asyncHanler(async (req, res) => {
     email: clerkUser.emailAddresses[0].emailAddress,
     firstName: clerkUser.firstName || "",
     lastName: clerkUser.lastName || "",
-    userName: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
+    username: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
     profilePicture: clerkUser.imageUrl || "",
   };
 

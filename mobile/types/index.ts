@@ -12,7 +12,7 @@ export interface Post {
   content: string;
   image?: string;
   likes: string[];
-  comments: string[];
+  comments: Comment[];
   createdAt: string;
 }
 

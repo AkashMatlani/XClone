@@ -44,7 +44,7 @@ const PostCard = ({ post, onLike, onDelete, currentUser, isLiked ,onComment}:
                             <Text className='font-bold text-gray-900 mr-1'>
                                 {post.user.firstName} {post.user.lastName}
                             </Text>
-                            <Text className='text-gray-500 ml-1'>@{post.user.userName}.{formatDate(post.createdAt)}</Text>
+                            <Text className='text-gray-500 ml-1'>@{post.user.username}.{formatDate(post.createdAt)}</Text>
                         </View>
                         {isOwnPost && (
                             <TouchableOpacity onPress={handleDelete}>

@@ -1,18 +1,9 @@
 export interface User {
   _id: string;
-  clerkId?: string;
-  email?: string;
   firstName?: string;
   lastName?: string;
   username?: string;
   profilePicture?: string;
-  bannerImage?: string;
-  bio?: string;
-  location?: string;
-  followers?: string[];
-  following?: string[];
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export interface Post {
@@ -23,5 +14,12 @@ export interface Post {
   likes: string[];
   comments: string[];
   createdAt: string;
+}
+
+export interface Comment{
+  _id:string,
+  content:string,
+  createdAt:string,
+  user:User;
 }
 

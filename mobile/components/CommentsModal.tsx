@@ -1,8 +1,10 @@
-import { View, Text, Modal, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, ScrollView, Image, TextInput, ActivityIndicator } from 'react-native'
 import React, { use } from 'react'
 import { Post } from '@/types';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+
+
 
 
 interface CommentsModalProps {
@@ -61,23 +63,29 @@ const CommentsModal = ({ seletedPost, onClose }: CommentsModalProps) => {
                     </View>
 
                     {/* Comment List */}
-                    {seletedPost.comments.map((comment) => (
+                    {seletedPost?.comments && seletedPost.comments.length > 0 ? (
+                        seletedPost.comments.map((comment) => (
                         <View key={comment._id} className='border-b border-gray-100 bg-white p-4'>
                             <View className='flex-row'>
                                 <Image source={{ uri: comment.user.profilePicture }}
                                     className='w-10 h-10 rounded-full mr-3'></Image>
-                            </View>
-                            <View className='flex-1'>
-                                <View className='flex-row items-center mb-1 '>
-                                    <Text className='font-bold text-gray-900 mr-1'>
-                                        {comment.user.firstName} {comment.user.firstName}{comment.user.lastName}
-                                    </Text>
-                                    <Text className='text-gray-500 text-sm ml-1'>@{comment.user.username}</Text>
-                                </View>
-                                <Text className='text-gray-900 text-base leading-5 mb-2'>{comment.content}</Text>
+                                    <View className='flex-1'>
+                                        <View className='flex-row items-center mb-1 '>
+                                            <Text className='font-bold text-gray-900 mr-1'>
+                                                {comment.user.firstName} {comment.user.lastName}
+                                            </Text>
+                                            <Text className='text-gray-500 text-sm ml-1'>@{comment.user.username}</Text>
+                                        </View>
+                                        <Text className='text-gray-900 text-base leading-5 mb-2'>{comment.content}</Text>
+                                    </View>
                             </View>
                         </View>
-                    ))}
+                        ))
+                    ) : (
+                        <View className='p-4 items-center'>
+                            <Text className='text-gray-500'>No comments yet</Text>
+                        </View>
+                    )}
 
                     {/* Add Comment Input */}
                     <View className='p-4 border-t  border-gray-100'>
@@ -97,10 +105,19 @@ const CommentsModal = ({ seletedPost, onClose }: CommentsModalProps) => {
                                 ></TextInput>
 
                                 <TouchableOpacity className={`px-4 py-2 rounded-lg  self-start${commentText.trim() ? ' bg-blue-500' : 'bg-gray-300'}`}
-                                
-                                 onPress={()=> createComment(seletedPost._id)}
-                                 disabled={!commentText.trim() || isCreatingComment}>
-                                 <Text>Reply</Text>
+
+                                    onPress={() => createComment(seletedPost._id)}
+                                    disabled={!commentText.trim() || isCreatingComment}>
+                                    {isCreatingComment ?
+                                        (<ActivityIndicator size={"small"} color={"white"} />
+                                        ) : (
+                                            <Text className={`font-semibold 
+                                                ${commentText.trim() ?
+                                                    'text-white' :
+                                                    'text-gray-500'}`}>
+                                                Reply
+                                            </Text>
+                                        )}
                                 </TouchableOpacity>
                             </View>
                         </View>

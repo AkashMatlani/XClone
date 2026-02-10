@@ -28,7 +28,7 @@ export const useComments = () => {
             return;
         }
 
-        createCommentMutation({ postId, content: commentText.trim() })
+        createCommentMutation.mutate({ postId, content: commentText.trim() })
     }
 
 

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from 'react-native';
 import { useApiClient, commentApi } from '@/utils/api';
 export const useComments = () => {
-    const [comentText, setCommentText] = useState('');
+    const [commentText, setCommentText] = useState('');
     const api = useApiClient();
     const queryClient = useQueryClient();
 
@@ -23,17 +23,17 @@ export const useComments = () => {
     });
 
     const createComment = (postId: string) => {
-        if (!comentText.trim()) {
+        if (!commentText.trim()) {
             Alert.alert("Empty Comment", "Please write something before posting!");
             return;
         }
 
-        createCommentMutation({ postId, content: comentText.trim() })
+        createCommentMutation({ postId, content: commentText.trim() })
     }
 
 
     return {
-        comentText,
+        commentText,
         setCommentText,
         createComment,
         isCreatingComment: createCommentMutation.isPending,

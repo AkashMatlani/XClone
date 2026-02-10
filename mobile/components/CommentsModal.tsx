@@ -1,4 +1,4 @@
-import { View, Text, Modal, TouchableOpacity, ScrollView, Image } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native'
 import React, { use } from 'react'
 import { Post } from '@/types';
 import { useComments } from '@/hooks/useComments';
@@ -11,7 +11,7 @@ interface CommentsModalProps {
 }
 const CommentsModal = ({ seletedPost, onClose }: CommentsModalProps) => {
 
-    const { comentText, setCommentText, createComment, isCreatingComment } = useComments();
+    const { commentText, setCommentText, createComment, isCreatingComment } = useComments();
 
     const { currentUser } = useCurrentUser();
 
@@ -72,10 +72,40 @@ const CommentsModal = ({ seletedPost, onClose }: CommentsModalProps) => {
                                     <Text className='font-bold text-gray-900 mr-1'>
                                         {comment.user.firstName} {comment.user.firstName}{comment.user.lastName}
                                     </Text>
+                                    <Text className='text-gray-500 text-sm ml-1'>@{comment.user.username}</Text>
                                 </View>
+                                <Text className='text-gray-900 text-base leading-5 mb-2'>{comment.content}</Text>
                             </View>
                         </View>
                     ))}
+
+                    {/* Add Comment Input */}
+                    <View className='p-4 border-t  border-gray-100'>
+                        <View className='flex-row items-center'>
+                            <Image
+                                source={{ uri: currentUser?.profilePicture }}
+                                className='size-10 rounded-full mr-3'></Image>
+
+                            <View className='flex-1'>
+                                <TextInput className='border border-gray-200 rounded-lg p-3 text-base mb-3'
+                                    placeholder='Write a Comment..'
+                                    value={commentText}
+                                    onChangeText={setCommentText}
+                                    multiline
+                                    numberOfLines={3}
+                                    textAlignVertical='top'
+                                ></TextInput>
+
+                                <TouchableOpacity className={`px-4 py-2 rounded-lg  self-start${commentText.trim() ? ' bg-blue-500' : 'bg-gray-300'}`}
+                                
+                                 onPress={()=> createComment(seletedPost._id)}
+                                 disabled={!commentText.trim() || isCreatingComment}>
+                                 <Text>Reply</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                    </View>
                 </ScrollView>
             )}
         </Modal>

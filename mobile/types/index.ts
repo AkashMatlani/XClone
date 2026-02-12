@@ -16,10 +16,32 @@ export interface Post {
   createdAt: string;
 }
 
-export interface Comment{
-  _id:string,
-  content:string,
-  createdAt:string,
-  user:User;
+export interface Comment {
+  _id: string,
+  content: string,
+  createdAt: string,
+  user: User;
+}
+
+export interface Notification {
+  id: string;
+  from: {
+    username: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+  };
+  to: string;
+  type: 'like' | 'comment' | 'follow';
+  post?: {
+    _id: string;
+    content: string;
+    image?: string;
+  };
+  comment?: {
+    _id: string;
+    content: string;
+  }
+  createdAt: string;
 }
 

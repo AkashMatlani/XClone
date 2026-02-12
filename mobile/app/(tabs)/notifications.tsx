@@ -2,6 +2,7 @@ import { Text, TouchableOpacity, View } from 'react-native'
 import React, { use } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNotification } from '@/hooks/useNotification';
+import { Feather } from '@expo/vector-icons';
 
 const NotificationScreen = () => {
 
@@ -19,8 +20,13 @@ const NotificationScreen = () => {
         )
     }
     return (
-        <SafeAreaView className='flex-1'>
-            <Text>NotificationScreen</Text>
+        <SafeAreaView className='flex-1 bg-white' edges={["top"]}>
+            <View className='flex-row justify-between items-center px-4 py-2 border-b border-gray-100'>
+                <Text className='text-xl font-bold p-4'>Notifications</Text>
+                <TouchableOpacity>
+                    <Feather name="settings" size={24} color="#657786" />
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     )
 }

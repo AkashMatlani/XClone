@@ -5,12 +5,14 @@ import { usePosts } from '@/hooks/usePosts';
 import PostCard from './PostCard';
 import { Post } from '../types';
 import CommentsModal from './CommentsModal';
-const PostsList = () => {
+const PostsList = ({ username }: { username?: string }) => {
 
     const { currentUser } = useCurrentUser();
-    const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts();
+    const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts(username);
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
+    console.log('DEBUG: currentUser loaded?', !!currentUser, currentUser?._id);
+    console.log('DEBUG: posts count:', posts.length);
     const seletedPost = selectedPostId ? posts.find((post: Post) => post._id === selectedPostId) : null;
 
     if (isLoading) {
@@ -33,7 +35,7 @@ const PostsList = () => {
         );
     }
 
-    if (posts && posts.length === 0) {
+    if (posts.length === 0) {
         return (
             <View className='p-8 items-center'>
                 <Text className='text-gray-500'>No posts yet</Text>

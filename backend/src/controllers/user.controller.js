@@ -94,6 +94,7 @@ export const syncUser = asyncHandler(async (req, res) => {
       details: error.message,
     });
   }
+});
 
 export const getCurrentUser = asyncHanler(async (req, res) => {
   const { userId } = getAuth(req);

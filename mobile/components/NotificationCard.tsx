@@ -1,6 +1,5 @@
-import { View, Text } from 'react-native'
+import { View, Text, Alert, Image } from 'react-native'
 import React from 'react'
-import { useNotification } from '@/hooks/useNotification';
 import { Notification } from '@/types';
 import { Feather } from '@expo/vector-icons';
 
@@ -10,8 +9,6 @@ interface NotificationCardProps {
 }
 
 const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => {
-
-    const { } = useNotification();
 
     const getNotificationText = () => {
         const name = `${notification.from.firstName} ${notification.from.lastName}`;
@@ -38,11 +35,54 @@ const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => 
             default:
                 return <Feather name="bell" size={20} color="#657786" />;
         }
-        return (
-            <View>
-                <Text>NotificationCard</Text>
-            </View>
-        )
     }
 
-    export default NotificationCard
+
+    const handleDelete = () => {
+        Alert.alert(
+            "Delete Notification",
+            "Are you sure you want to delete this notification?", [
+            {
+                text: "Cancel",
+                style: "cancel"
+            },
+            {
+                text: "Delete",
+                onPress: () => onDelete(notification.id),
+                style: "destructive"
+            }
+        ]);
+    }
+
+    return (
+        <View className='border-b border-gray-100 bg-white'>
+            <View className='flex-row p-4'>
+                <View className='relative mr-3'>
+                    <Image
+                        source={{ uri: notification.from.profilePicture }} className='size-12 rounded-full' />
+                    <View className='absolute -bottom-1 -right-1 bg-white justify-center items-center'>
+                        {getNotificationIcon()}
+                    </View>
+                </View>
+                <View className='flex-1'>
+                    <View className='flex-row items-start justify-between mb-1'>
+                        <View className='flex-1'>
+                            <Text className='font-semibold
+                             text-gray-900 leading-5 mb-1'>
+                                <Text className='font-semibold text-gray-900'>{notification.from.firstName}
+                                    {notification.from.lastName}
+                                </Text>
+                                <Text className='text-gray-500'>@{notification.from.username}  </Text>
+                            </Text>
+                            <Text className='text-gray-900'>{getNotificationText()}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+
+            </View>
+        </View>
+    )
+}
+
+export default NotificationCard

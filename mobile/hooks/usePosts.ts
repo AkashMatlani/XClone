@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApiClient, postApi } from "../utils/api";
 
-
-export const usePosts = () => {
+export const usePosts = (username?:string) => {
     const api = useApiClient();
     const queryClient = useQueryClient();
 
@@ -12,16 +11,18 @@ export const usePosts = () => {
         error,
         refetch
     } = useQuery({
-        queryKey: ['posts'],
+        queryKey: username ? ["userPosts", username] : ["posts"],
         queryFn: () => postApi.getPosts(api),
         select: (response) => response.data.posts,
     });
 
     const likePostMutation = useMutation({
-        mutationFn: (postId: string) =>
-            postApi.likePost(api, postId),
+        mutationFn: (postId: string) =>postApi.likePost(api, postId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['posts'] });
+            if (username) {
+                queryClient.invalidateQueries({ queryKey: ['userPosts', username] });
+            }
         }
     });
 
@@ -30,12 +31,17 @@ export const usePosts = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['posts'] });
             queryClient.invalidateQueries({ queryKey: ['userPosts'] });
+            if (username) {
+                queryClient.invalidateQueries({ queryKey: ['userPosts', username] });
+            }
         }
     });
 
-    const checkIsLiked = (postLikes: string[], currentUser: any) => {
-        const isLiked = currentUser && postLikes.includes(currentUser._id);
-        return isLiked;
+    const checkIsLiked = (postLikes: any[] = [], currentUser: any) => {
+        if (!currentUser || !currentUser._id) return false;
+        return postLikes.some(id =>
+            typeof id === 'string' ? id === currentUser._id : (id && id._id === currentUser._id)
+        );
     };
 
     return {

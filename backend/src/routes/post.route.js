@@ -17,12 +17,12 @@ const router = express.Router();
 router.get("/", getPosts);
 router.get("/:postId", getPost);
 //GetPost data using UserName
-router.get("/user:username", getUserPosts);
+router.get("/user/:username", getUserPosts);
 
 //protected
 
 router.post("/", protectRoute, upload.single("image"), createPost);
-router.post("/postId/like", protectRoute, likePost);
-router.delete("/postId", protectRoute, deletePost);
+router.post("/:postId/like", protectRoute, likePost);
+router.delete("/:postId", protectRoute, deletePost);
 
 export default router;

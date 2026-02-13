@@ -24,7 +24,7 @@ export interface Comment {
 }
 
 export interface Notification {
-  id: string;
+  _id: string;
   from: {
     username: string;
     firstName: string;

@@ -22,34 +22,78 @@ export const updateProfile = asyncHanler(async (req, res) => {
   res.status(200).json({ user });
 });
 
-export const syncUser = asyncHanler(async (req, res) => {
+// export const syncUser = asyncHanler(async (req, res) => {
+//   const { userId } = getAuth(req);
+
+//   //check if user alreday Exist in mongodb
+
+//   const existingUser = await User.findOne({ clerkId: userId });
+//   if (existingUser) {
+//     return res
+//       .status(200)
+//       .json({ user: existingUser, message: "User alreday Exist" });
+//   }
+
+//   //Create new User from Clerk data
+//   const clerkUser = await clerkClient.users.getUser(userId);
+
+//   const userData = {
+//     clerkId: userId,
+//     email: clerkUser.emailAddresses[0].emailAddress,
+//     firstName: clerkUser.firstName || "",
+//     lastName: clerkUser.lastName || "",
+//     username: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
+//     profilePicture: clerkUser.imageUrl || "",
+//   };
+
+//   const user = await User.create(userData);
+
+//   res.status(201).json({ user, message: "User Created successfully" });
+// });
+
+
+export const syncUser = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
 
-  //check if user alreday Exist in mongodb
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized: userId missing" });
+  }
 
   const existingUser = await User.findOne({ clerkId: userId });
   if (existingUser) {
-    return res
-      .status(200)
-      .json({ user: existingUser, message: "User alreday Exist" });
+    return res.status(200).json({ user: existingUser, message: "User already exists" });
   }
 
-  //Create new User from Clerk data
-  const clerkUser = await clerkClient.users.getUser(userId);
+  try {
+    const clerkUser = await clerkClient.users.getUser(userId);
 
-  const userData = {
-    clerkId: userId,
-    email: clerkUser.emailAddresses[0].emailAddress,
-    firstName: clerkUser.firstName || "",
-    lastName: clerkUser.lastName || "",
-    username: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
-    profilePicture: clerkUser.imageUrl || "",
-  };
+    if (!clerkUser) {
+      return res.status(400).json({ error: "Unable to fetch user from Clerk" });
+    }
+    const emailObj = clerkUser.emailAddresses?.[0];
+    if (!emailObj?.emailAddress) {
+      return res.status(400).json({ error: "Clerk user has no email" });
+    }
 
-  const user = await User.create(userData);
+    const userData = {
+      clerkId: userId,
+      email: emailObj.emailAddress,
+      firstName: clerkUser.firstName || "",
+      lastName: clerkUser.lastName || "",
+      username: emailObj.emailAddress.split("@")[0],
+      profilePicture: clerkUser.imageUrl || "",
+    };
 
-  res.status(201).json({ user, message: "User Created successfully" });
-});
+    const user = await User.create(userData);
+
+    res.status(201).json({ user, message: "User created successfully" });
+  } catch (error) {
+    console.error("User Sync failed:", error);
+    res.status(500).json({
+      error: "Failed to sync user",
+      details: error.message,
+    });
+  }
 
 export const getCurrentUser = asyncHanler(async (req, res) => {
   const { userId } = getAuth(req);

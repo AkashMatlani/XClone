@@ -56,7 +56,7 @@ export const syncUser = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
 
   if (!userId) {
-    return res.status(401).json({ error: "Unauthorized: userId missing" });
+    return res.status(401).json({ error: "Unauthorized - missing user ID" });
   }
 
   const existingUser = await User.findOne({ clerkId: userId });
@@ -66,35 +66,45 @@ export const syncUser = asyncHandler(async (req, res) => {
 
   try {
     const clerkUser = await clerkClient.users.getUser(userId);
-
     if (!clerkUser) {
-      return res.status(400).json({ error: "Unable to fetch user from Clerk" });
-    }
-    const emailObj = clerkUser.emailAddresses?.[0];
-    if (!emailObj?.emailAddress) {
-      return res.status(400).json({ error: "Clerk user has no email" });
+      return res.status(404).json({ error: "Clerk user not found" });
     }
 
+    const email = clerkUser.emailAddresses[0]?.emailAddress;
+    if (!email) {
+      return res.status(400).json({ error: "User email not found in Clerk" });
+    }
+
+    // Generate a unique username
+    let baseUsername = email.split("@")[0];
+    let username = baseUsername;
+    let counter = 1;
+    while (await User.findOne({ username })) {
+      username = `${baseUsername}${counter}`;
+      counter++;
+    }
+
+    // Prepare user data
     const userData = {
       clerkId: userId,
-      email: emailObj.emailAddress,
+      email,
       firstName: clerkUser.firstName || "",
       lastName: clerkUser.lastName || "",
-      username: emailObj.emailAddress.split("@")[0],
+      username,
       profilePicture: clerkUser.imageUrl || "",
     };
 
+    // Save user in DB
     const user = await User.create(userData);
 
     res.status(201).json({ user, message: "User created successfully" });
+
   } catch (error) {
-    console.error("User Sync failed:", error);
-    res.status(500).json({
-      error: "Failed to sync user",
-      details: error.message,
-    });
+    console.error("SyncUser error:", error);
+    res.status(500).json({ error: "User sync failed", details: error.message });
   }
 });
+
 
 export const getCurrentUser = asyncHanler(async (req, res) => {
   const { userId } = getAuth(req);

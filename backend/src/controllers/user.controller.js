@@ -22,47 +22,33 @@ export const updateProfile = asyncHanler(async (req, res) => {
   res.status(200).json({ user });
 });
 
-export const syncUser = asyncHandler(async (req, res) => {
-  const userId = req.auth.userId;
+export const syncUser = asyncHanler(async (req, res) => {
+  const { userId } = getAuth(req);
 
-  if (!userId) {
-    return res.status(401).json({ error: "No userId" });
-  }
+  //check if user alreday Exist in mongodb
 
-  let existingUser = await User.findOne({ clerkId: userId });
+  const existingUser = await User.findOne({ clerkId: userId });
   if (existingUser) {
-    return res.status(200).json({ user: existingUser });
+    return res
+      .status(200)
+      .json({ user: existingUser, message: "User alreday Exist" });
   }
 
+  //Create new User from Clerk data
   const clerkUser = await clerkClient.users.getUser(userId);
 
-  const email =
-    clerkUser.emailAddresses?.[0]?.emailAddress ||
-    clerkUser.primaryEmailAddress?.emailAddress;
-
-  if (!email) {
-    return res.status(400).json({ error: "No email from Clerk" });
-  }
-
-  let baseUsername = email.split("@")[0];
-  let username = baseUsername;
-  let counter = 1;
-
-  while (await User.findOne({ username })) {
-    username = `${baseUsername}${counter}`;
-    counter++;
-  }
-
-  const user = await User.create({
+  const userData = {
     clerkId: userId,
-    email,
+    email: clerkUser.emailAddresses[0].emailAddress,
     firstName: clerkUser.firstName || "",
     lastName: clerkUser.lastName || "",
-    username,
+    username: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
     profilePicture: clerkUser.imageUrl || "",
-  });
+  };
 
-  res.status(201).json({ user });
+  const user = await User.create(userData);
+
+  res.status(201).json({ user, message: "User Created successfully" });
 });
 
 export const getCurrentUser = asyncHanler(async (req, res) => {

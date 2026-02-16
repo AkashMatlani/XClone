@@ -5,7 +5,7 @@ import { useApiClient, userApi } from "@/utils/api";
 import { useUser } from '@clerk/clerk-expo'
 
 export const useUserSync = () => {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded, getToken } = useAuth();
   const { user } = useUser();
   const api = useApiClient();
 
@@ -21,15 +21,30 @@ export const useUserSync = () => {
     onError: (error) => console.error("User Sync failed:", error),
   });
 
-  useEffect(() => {
+useEffect(() => {
     if (!isLoaded || !isSignedIn || !user?.id) return;
 
-    // Skip sync if this user was already synced
+    // already synced
     if (lastSyncedUserId.current === user.id) return;
 
-    console.log("Syncing user:", user.id);
-    syncUserMutation.mutate();
-  }, [user?.id, isSignedIn, isLoaded]);
+    const runSync = async () => {
+      // 🔥 force fresh token for THIS user
+      const token = await getToken({ skipCache: true });
+
+      if (!token) return;
+
+      console.log("Syncing for user:", user.id);
+       if (!token) return;
+
+      console.log("Syncing for user:", user.id);
+      syncUserMutation.mutate();
+    };
+
+    // 🔥 delay ensures Clerk switches session
+    const timeout = setTimeout(runSync, 800);
+
+    return () => clearTimeout(timeout);
+  }, [user?.id, isLoaded, isSignedIn]);
 };
 
 

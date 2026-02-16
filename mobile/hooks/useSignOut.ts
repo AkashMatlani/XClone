@@ -14,7 +14,9 @@ export const useSignOut = () => {
             {
                 text: "Logout",
                 style: "destructive",
-                onPress: () => signOut(),
+                onPress: async () => {
+                    await signOut();
+                }
             }
         ])
     }

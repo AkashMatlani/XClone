@@ -22,53 +22,46 @@ export const updateProfile = asyncHanler(async (req, res) => {
   res.status(200).json({ user });
 });
 
-export const syncUser = asyncHanler(async (req, res) => {
+export const syncUser = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
 
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
-
   // Check if user already exists
-  const existingUser = await User.findOne({ clerkId: userId });
+  let existingUser = await User.findOne({ clerkId: userId });
   if (existingUser) {
     return res.status(200).json({ user: existingUser, message: "User already exists" });
   }
 
-  let clerkUser;
-  try {
-    clerkUser = await clerkClient.users.getUser(userId);
-  } catch (error) {
-    console.error("CLERK ERROR:", error.message);
-    return res.status(401).json({ error: "Invalid Clerk user" });
-  }
+  // Create new User from Clerk
+  const clerkUser = await clerkClient.users.getUser(userId);
 
-  // Generate unique username
-  const baseUsername = clerkUser.emailAddresses[0].emailAddress.split("@")[0];
+  // Generate a unique username
+  let baseUsername = clerkUser.emailAddresses[0].emailAddress.split("@")[0];
   let username = baseUsername;
   let counter = 1;
-
   while (await User.findOne({ username })) {
     username = `${baseUsername}${counter}`;
     counter++;
   }
 
-  // Create user safely
-  let user;
-  try {
-    user = await User.create({
-      clerkId: userId,
-      email: clerkUser.emailAddresses[0].emailAddress,
-      firstName: clerkUser.firstName || "",
-      lastName: clerkUser.lastName || "",
-      username,
-      profilePicture: clerkUser.imageUrl || "",
-    });
-  } catch (error) {
-    console.error("MONGO ERROR:", error.message);
-    return res.status(500).json({ error: "Failed to create user" });
-  }
+  console.log("Creating user with username:", username);
+  const userData = {
+    clerkId: userId,
+    email: clerkUser.emailAddresses[0].emailAddress,
+    firstName: clerkUser.firstName || "",
+    lastName: clerkUser.lastName || "",
+    username,
+    profilePicture: clerkUser.imageUrl || "",
+  };
 
-  res.status(201).json({ user, message: "User created successfully" });
+  try {
+    const user = await User.create(userData);
+    res.status(201).json({ user, message: "User created successfully" });
+  } catch (error) {
+    console.error("User creation failed:", error);
+    res.status(500).json({ error: "Failed to create user. Possibly duplicate email/username." });
+  }
 });
+
 
 
 export const getCurrentUser = asyncHanler(async (req, res) => {

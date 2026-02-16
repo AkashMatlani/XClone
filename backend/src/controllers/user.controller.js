@@ -23,46 +23,47 @@ export const updateProfile = asyncHanler(async (req, res) => {
 });
 
 export const syncUser = asyncHandler(async (req, res) => {
-  const { userId } = getAuth(req);
+  const userId = req.auth.userId;
 
-  // Check if user already exists
-  let existingUser = await User.findOne({ clerkId: userId });
-  if (existingUser) {
-    return res.status(200).json({ user: existingUser, message: "User already exists" });
+  if (!userId) {
+    return res.status(401).json({ error: "No userId" });
   }
 
-  // Create new User from Clerk
+  let existingUser = await User.findOne({ clerkId: userId });
+  if (existingUser) {
+    return res.status(200).json({ user: existingUser });
+  }
+
   const clerkUser = await clerkClient.users.getUser(userId);
 
-  // Generate a unique username
-  let baseUsername = clerkUser.emailAddresses[0].emailAddress.split("@")[0];
+  const email =
+    clerkUser.emailAddresses?.[0]?.emailAddress ||
+    clerkUser.primaryEmailAddress?.emailAddress;
+
+  if (!email) {
+    return res.status(400).json({ error: "No email from Clerk" });
+  }
+
+  let baseUsername = email.split("@")[0];
   let username = baseUsername;
   let counter = 1;
+
   while (await User.findOne({ username })) {
     username = `${baseUsername}${counter}`;
     counter++;
   }
 
-  console.log("Creating user with username:", username);
-  const userData = {
+  const user = await User.create({
     clerkId: userId,
-    email: clerkUser.emailAddresses[0].emailAddress,
+    email,
     firstName: clerkUser.firstName || "",
     lastName: clerkUser.lastName || "",
     username,
     profilePicture: clerkUser.imageUrl || "",
-  };
+  });
 
-  try {
-    const user = await User.create(userData);
-    res.status(201).json({ user, message: "User created successfully" });
-  } catch (error) {
-    console.error("User creation failed:", error);
-    res.status(500).json({ error: "Failed to create user. Possibly duplicate email/username." });
-  }
+  res.status(201).json({ user });
 });
-
-
 
 export const getCurrentUser = asyncHanler(async (req, res) => {
   const { userId } = getAuth(req);

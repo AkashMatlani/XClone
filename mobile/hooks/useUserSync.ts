@@ -4,36 +4,28 @@ import { useAuth } from "@clerk/clerk-expo";
 import { useApiClient, userApi } from "@/utils/api";
 import { useUser } from '@clerk/clerk-expo'
 
+
 export const useUserSync = () => {
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const api = useApiClient();
 
-  // Track last synced user id
+  // Track last synced user
   const lastSyncedUserId = useRef<string | null>(null);
 
   const syncUserMutation = useMutation({
     mutationFn: () => userApi.syncUser(api),
     onSuccess: (response: any) => {
       console.log("User synced:", response.data.user);
-      lastSyncedUserId.current = user?.id || null; // update last synced user
+      lastSyncedUserId.current = user?.id || null; // mark current user as synced
     },
-    onError: (error) => {
-      console.error("User Sync failed:", error);
-    },
+    onError: (error) => console.error("User Sync failed:", error),
   });
 
   useEffect(() => {
-    // Do not sync until Clerk fully loaded
-    if (!isLoaded) return;
+    if (!isLoaded || !isSignedIn || !user?.id) return;
 
-    // Only sync if signed in
-    if (!isSignedIn) return;
-
-    // Only sync if user exists
-    if (!user?.id) return;
-
-    // Avoid syncing same user twice
+    //Prevent old token / same user from syncing again
     if (lastSyncedUserId.current === user.id) return;
 
     console.log("Syncing user:", user.id);
@@ -42,4 +34,5 @@ export const useUserSync = () => {
 
   return null;
 };
+
 

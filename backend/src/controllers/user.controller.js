@@ -25,24 +25,24 @@ export const updateProfile = asyncHanler(async (req, res) => {
 export const syncUser = asyncHanler(async (req, res) => {
   const { userId } = getAuth(req);
 
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-  // Check if already exists
+  // Check if user already exists
   const existingUser = await User.findOne({ clerkId: userId });
   if (existingUser) {
-    return res.status(200).json({
-      user: existingUser,
-      message: "User already exists",
-    });
+    return res.status(200).json({ user: existingUser, message: "User already exists" });
   }
 
-  const clerkUser = await clerkClient.users.getUser(userId);
+  let clerkUser;
+  try {
+    clerkUser = await clerkClient.users.getUser(userId);
+  } catch (error) {
+    console.error("CLERK ERROR:", error.message);
+    return res.status(401).json({ error: "Invalid Clerk user" });
+  }
 
-  const baseUsername =
-    clerkUser.emailAddresses[0].emailAddress.split("@")[0];
-
+  // Generate unique username
+  const baseUsername = clerkUser.emailAddresses[0].emailAddress.split("@")[0];
   let username = baseUsername;
   let counter = 1;
 
@@ -51,22 +51,25 @@ export const syncUser = asyncHanler(async (req, res) => {
     counter++;
   }
 
-  const userData = {
-    clerkId: userId,
-    email: clerkUser.emailAddresses[0].emailAddress,
-    firstName: clerkUser.firstName || "",
-    lastName: clerkUser.lastName || "",
-    username,
-    profilePicture: clerkUser.imageUrl || "",
-  };
+  // Create user safely
+  let user;
+  try {
+    user = await User.create({
+      clerkId: userId,
+      email: clerkUser.emailAddresses[0].emailAddress,
+      firstName: clerkUser.firstName || "",
+      lastName: clerkUser.lastName || "",
+      username,
+      profilePicture: clerkUser.imageUrl || "",
+    });
+  } catch (error) {
+    console.error("MONGO ERROR:", error.message);
+    return res.status(500).json({ error: "Failed to create user" });
+  }
 
-  const user = await User.create(userData);
-
-  res.status(201).json({
-    user,
-    message: "User created successfully",
-  });
+  res.status(201).json({ user, message: "User created successfully" });
 });
+
 
 export const getCurrentUser = asyncHanler(async (req, res) => {
   const { userId } = getAuth(req);

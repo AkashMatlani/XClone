@@ -23,10 +23,19 @@ export const updateProfile = asyncHanler(async (req, res) => {
 });
 
 export const syncUser = asyncHanler(async (req, res) => {
-  const { userId } = getAuth(req);
+  console.log("---- SYNC USER CALLED ----");
+
+  const auth = getAuth(req);
+  console.log("Auth object:", auth);
+  const { userId } = auth;
+  console.log("User ID:", userId);
 
   //check if user alreday Exist in mongodb
 
+  if (!userId) {
+    console.log("No userId found ");
+    return res.status(401).json({ error: "Unauthorized" });
+  }
   const existingUser = await User.findOne({ clerkId: userId });
   if (existingUser) {
     return res
@@ -34,8 +43,11 @@ export const syncUser = asyncHanler(async (req, res) => {
       .json({ user: existingUser, message: "User alreday Exist" });
   }
 
+  console.log("Fetching user from Clerk...");
+
   //Create new User from Clerk data
   const clerkUser = await clerkClient.users.getUser(userId);
+  console.log("Clerk user fetched ");
 
   const userData = {
     clerkId: userId,
@@ -47,6 +59,7 @@ export const syncUser = asyncHanler(async (req, res) => {
   };
 
   const user = await User.create(userData);
+  console.log("User created in DB");
 
   res.status(201).json({ user, message: "User Created successfully" });
 });
@@ -100,11 +113,9 @@ export const followUser = asyncHanler(async (req, res) => {
     });
   }
 
-  res
-    .status(200)
-    .json({
-      message: isFollowing
-        ? "User unfollowed successfully"
-        : "User followed successfully",
-    });
+  res.status(200).json({
+    message: isFollowing
+      ? "User unfollowed successfully"
+      : "User followed successfully",
+  });
 });

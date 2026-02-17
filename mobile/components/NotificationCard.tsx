@@ -1,4 +1,4 @@
-import { View, Text, Alert, Image } from 'react-native'
+import { View, Text, Alert, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Notification } from '@/types';
 import { Feather } from '@expo/vector-icons';
@@ -8,8 +8,9 @@ interface NotificationCardProps {
     onDelete: (notificationId: string) => void;
 }
 
-const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => {
-
+const NotificationCard = ({ notification, onDelete }: 
+    NotificationCardProps) => {
+        
     const getNotificationText = () => {
         const name = `${notification.from.firstName} ${notification.from.lastName}`;
         switch (notification.type) {
@@ -22,7 +23,7 @@ const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => 
             default:
                 return '';
         }
-    }
+    };
 
     const getNotificationIcon = () => {
         switch (notification.type) {
@@ -35,7 +36,7 @@ const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => 
             default:
                 return <Feather name="bell" size={20} color="#657786" />;
         }
-    }
+    };
 
 
     const handleDelete = () => {
@@ -48,11 +49,11 @@ const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => 
             },
             {
                 text: "Delete",
-                onPress: () => onDelete(notification.id),
+                onPress: () => onDelete(notification._id),
                 style: "destructive"
             }
         ]);
-    }
+    };
 
     return (
         <View className='border-b border-gray-100 bg-white'>
@@ -77,12 +78,15 @@ const NotificationCard = ({ notification, onDelete }: NotificationCardProps) => 
                             <Text className='text-gray-900'>{getNotificationText()}
                             </Text>
                         </View>
+                        <TouchableOpacity onPress={handleDelete} className='ml-2 p-1'>
+                            <Feather name='trash' size={16} color='#E0245E' />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
             </View>
         </View>
-    )
-}
+    );
+};
 
 export default NotificationCard

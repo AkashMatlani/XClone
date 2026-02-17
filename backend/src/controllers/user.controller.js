@@ -22,11 +22,6 @@ export const updateProfile = asyncHanler(async (req, res) => {
   res.status(200).json({ user });
 });
 
-import asyncHandler from "express-async-handler";
-import { getAuth } from "@clerk/clerk-sdk-node";
-import { clerkClient } from "../clerkClient"; // adjust import
-import User from "../models/User";
-
 export const syncUser = asyncHandler(async (req, res) => {
   console.log("---- SYNC USER CALLED ----");
 
@@ -35,11 +30,10 @@ export const syncUser = asyncHandler(async (req, res) => {
 
   const { userId } = auth;
   if (!userId) {
-    console.log("No userId found");
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // Check if user already exists in MongoDB
+  // Check if user already exists
   const existingUser = await User.findOne({ clerkId: userId });
   if (existingUser) {
     return res
@@ -49,39 +43,46 @@ export const syncUser = asyncHandler(async (req, res) => {
 
   console.log("Fetching user from Clerk...");
   const clerkUser = await clerkClient.users.getUser(userId);
-  console.log("Clerk user fetched");
-
-  // Ensure email exists
   const email = clerkUser.emailAddresses?.[0]?.emailAddress;
   if (!email) {
-    return res
-      .status(400)
-      .json({ error: "Cannot create user: no email found from Clerk" });
+    return res.status(400).json({ error: "Cannot create user: no email found" });
   }
 
-  // Generate username safely
-  let username = clerkUser.firstName
-    ? `${clerkUser.firstName.toLowerCase()}${Math.floor(Math.random() * 1000)}`
+  // Base username
+  let baseUsername = clerkUser.firstName
+    ? clerkUser.firstName.toLowerCase()
     : email.split("@")[0].toLowerCase();
 
-  // Make sure username is unique in DB
-  let usernameExists = await User.findOne({ username });
-  while (usernameExists) {
-    username = `${username}${Math.floor(Math.random() * 1000)}`;
-    usernameExists = await User.findOne({ username });
+  let user;
+  let attempts = 0;
+  const maxAttempts = 5;
+
+  while (attempts < maxAttempts) {
+    let username = attempts === 0 ? baseUsername : `${baseUsername}${Math.floor(Math.random() * 1000)}`;
+    try {
+      user = await User.create({
+        clerkId: userId,
+        email,
+        firstName: clerkUser.firstName || "",
+        lastName: clerkUser.lastName || "",
+        username,
+        profilePicture: clerkUser.imageUrl || "",
+      });
+      break; // success
+    } catch (err) {
+      if (err.code === 11000 && err.keyPattern?.username) {
+        // Duplicate username, try again
+        attempts++;
+      } else {
+        // Other errors
+        throw err;
+      }
+    }
   }
 
-  const userData = {
-    clerkId: userId,
-    email,
-    firstName: clerkUser.firstName || "",
-    lastName: clerkUser.lastName || "",
-    username,
-    profilePicture: clerkUser.imageUrl || "",
-  };
-
-  const user = await User.create(userData);
-  console.log("User created in DB");
+  if (!user) {
+    return res.status(500).json({ error: "Failed to create unique username after multiple attempts" });
+  }
 
   res.status(201).json({ user, message: "User created successfully" });
 });

@@ -8,9 +8,9 @@ interface NotificationCardProps {
     onDelete: (notificationId: string) => void;
 }
 
-const NotificationCard = ({ notification, onDelete }: 
+const NotificationCard = ({ notification, onDelete }:
     NotificationCardProps) => {
-        
+
     const getNotificationText = () => {
         const name = `${notification.from.firstName} ${notification.from.lastName}`;
         switch (notification.type) {
@@ -82,8 +82,21 @@ const NotificationCard = ({ notification, onDelete }:
                             <Feather name='trash' size={16} color='#E0245E' />
                         </TouchableOpacity>
                     </View>
-                </View>
 
+                    {notification.post && (
+                        <View className='bg-gray-50 rounded-lg p-3 mb-2'>
+                            <Text className='text-gray-700 text-sm mb-1' numberOfLines={3}>
+                                {notification.post.content}
+                            </Text>
+                            {notification.post.image && (
+                                <Image
+                                    source={{ uri: notification.post.image }}
+                                    className='w-full h-32 rounded-lg mt-2'
+                                    resizeMode='cover' />
+                            )}
+                        </View>
+                    )}
+                </View>
             </View>
         </View>
     );

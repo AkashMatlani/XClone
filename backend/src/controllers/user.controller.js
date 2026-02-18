@@ -22,85 +22,32 @@ export const updateProfile = asyncHandler(async (req, res) => {
   res.status(200).json({ user });
 });
 
+
 export const syncUser = asyncHandler(async (req, res) => {
-  console.log("---- SYNC USER CALLED ----");
+  const { userId } = getAuth(req);
 
-  const auth = getAuth(req);
-  const { userId } = auth;
-
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
+  // check if user already exists in mongodb
+  const existingUser = await User.findOne({ clerkId: userId });
+  if (existingUser) {
+    return res.status(200).json({ user: existingUser, message: "User already exists" });
   }
 
-  console.log("Fetching user from Clerk...");
+  // create new user from Clerk data
   const clerkUser = await clerkClient.users.getUser(userId);
 
-  const email = clerkUser.emailAddresses?.[0]?.emailAddress;
-  if (!email) {
-    return res.status(400).json({ error: "Cannot create user: no email found" });
-  }
+  const userData = {
+    clerkId: userId,
+    email: clerkUser.emailAddresses[0].emailAddress,
+    firstName: clerkUser.firstName || "",
+    lastName: clerkUser.lastName || "",
+    username: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
+    profilePicture: clerkUser.imageUrl || "",
+  };
 
-  // Base username
-  let baseUsername = clerkUser.firstName
-    ? clerkUser.firstName.toLowerCase()
-    : email.split("@")[0].toLowerCase();
+  const user = await User.create(userData);
 
-  let attempts = 0;
-  const maxAttempts = 5;
-  let finalUsername;
-
-  while (attempts < maxAttempts) {
-    const username =
-      attempts === 0
-        ? baseUsername
-        : `${baseUsername}${Math.floor(Math.random() * 1000)}`;
-
-    try {
-      const user = await User.findOneAndUpdate(
-        { clerkId: userId }, // PRIMARY identity
-        {
-          $setOnInsert: {
-            clerkId: userId,
-            email,
-            firstName: clerkUser.firstName || "",
-            lastName: clerkUser.lastName || "",
-            username,
-            profilePicture: clerkUser.imageUrl || "",
-          },
-        },
-        {
-          new: true,
-          upsert: true,
-        }
-      );
-
-      finalUsername = username;
-      return res.status(200).json({
-        user,
-        message: "User synced successfully",
-      });
-    } catch (err) {
-      if (err.code === 11000 && err.keyPattern?.username) {
-        attempts++;
-      } else if (err.code === 11000 && err.keyPattern?.email) {
-        // Email already exists → fetch that user
-        const existingEmailUser = await User.findOne({ email });
-        return res.status(200).json({
-          user: existingEmailUser,
-          message: "User already exists with this email",
-        });
-      } else {
-        throw err;
-      }
-    }
-  }
-
-  return res.status(500).json({
-    error: "Failed to generate unique username after multiple attempts",
-  });
+  res.status(201).json({ user, message: "User created successfully" });
 });
-
-
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);

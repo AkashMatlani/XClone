@@ -96,6 +96,15 @@ const NotificationCard = ({ notification, onDelete }:
                             )}
                         </View>
                     )}
+
+                    {notification.comment && (
+                        <View className='bg-blue-50 rounded-lg p-3 mb-2'>
+                            <Text className='text-gray-600 text-xs mb-1'>Comment:</Text>
+                            <Text className='text-gray-700 text-sm' numberOfLines={2}>
+                                &ldquo;{notification.comment.content}&rdquo;
+                            </Text>
+                        </View>
+                    )}
                 </View>
             </View>
         </View>

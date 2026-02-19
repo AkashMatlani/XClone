@@ -7,8 +7,8 @@ import { useAuth } from '@clerk/clerk-expo';
 
 const TabsLayout = () => {
     const insets = useSafeAreaInsets();
-    const { isSignedIn } = useAuth();
-
+    const { isLoaded,isSignedIn } = useAuth();
+    if (!isLoaded) return null;
     if (!isSignedIn) return <Redirect href="/(auth)"/>
     return (
         <Tabs screenOptions={{

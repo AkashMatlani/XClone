@@ -1,10 +1,21 @@
 import { useSocialAuth } from "@/hooks/useSocialAuth";
 import { Image, TouchableOpacity, View, Text, ActivityIndicator } from "react-native";
+import { useAuth } from "@clerk/clerk-expo";
 
 //Login Page
 export default function Index() {
 
   const { handleSocialAuth, isLoading } = useSocialAuth();
+  const {isLoaded,isSignedIn} = useAuth();
+
+  if(!isLoaded || isLoading || isSignedIn){
+
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center',backgroundColor : "white"   }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
   return <View className="flex-1 bg-white">
     <View className="flex-1 px-8 justify-between">
       <View className="flex-1 justify-center">

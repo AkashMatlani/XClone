@@ -2,6 +2,7 @@ import { View, Text, Alert, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Notification } from '@/types';
 import { Feather } from '@expo/vector-icons';
+import { formatDate } from '@/utils/formatters';
 
 interface NotificationCardProps {
     notification: Notification;
@@ -105,6 +106,8 @@ const NotificationCard = ({ notification, onDelete }:
                             </Text>
                         </View>
                     )}
+
+                    <Text className='text-gray-400 text-xs'>{formatDate(notification.createdAt)}</Text>
                 </View>
             </View>
         </View>

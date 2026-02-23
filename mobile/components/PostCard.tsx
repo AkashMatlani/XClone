@@ -13,13 +13,13 @@ interface PostCardProps {
     isLiked?: boolean;
 }
 
-const PostCard = ({ post, onLike, onDelete, currentUser, isLiked ,onComment}:
+const PostCard = ({ post, onLike, onDelete, currentUser, isLiked, onComment }:
     PostCardProps) => {
 
-    console.log('Post user:', post.user);
+if (!post || !post.user || !currentUser) return null;
 
-    console.log('PostCard Rendered for post:', post.user.profilePicture);
-    const isOwnPost = post.user._id === currentUser._id;
+    const isOwnPost = post.user?._id === currentUser?._id;
+
     const handleDelete = () => {
         Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
             { text: "Cancel", style: "cancel" },
@@ -31,10 +31,11 @@ const PostCard = ({ post, onLike, onDelete, currentUser, isLiked ,onComment}:
         ]
         )
     }
+
     return (
         <View className='border-b border-gray-100 bg-white'>
             <View className='flex-row p-4'>
-                <Image source={{ uri: post.user.profilePicture }}
+                <Image source={{ uri: post.user.profilePicture || 'https://via.placeholder.com/150' }}
                     className='w-12 h-12 rounded-full mr-3'
                 />
 
@@ -42,9 +43,9 @@ const PostCard = ({ post, onLike, onDelete, currentUser, isLiked ,onComment}:
                     <View className='flex-row items-center justify-between mb-1'>
                         <View className='flex-row items-center'>
                             <Text className='font-bold text-gray-900 mr-1'>
-                                {post.user.firstName} {post.user.lastName}
+                                {post.user?.firstName} {post.user?.lastName}
                             </Text>
-                            <Text className='text-gray-500 ml-1'>@{post.user.username}.{formatDate(post.createdAt)}</Text>
+                            <Text className='text-gray-500 ml-1'>@{post.user?.username}.{formatDate(post.createdAt)}</Text>
                         </View>
                         {isOwnPost && (
                             <TouchableOpacity onPress={handleDelete}>
@@ -76,14 +77,14 @@ const PostCard = ({ post, onLike, onDelete, currentUser, isLiked ,onComment}:
                             <Text className='text-gray-500 text-sm ml-2'>0</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity className='flex-row items-center' onPress={()=> onLike(post._id)}>
-                            {isLiked?(<AntDesign name='heart' size={18} color="#E02424" />)
-                            :(<Feather name='heart' size={18} color="#657786" />
+                        <TouchableOpacity className='flex-row items-center' onPress={() => onLike(post._id)}>
+                            {isLiked ? (<AntDesign name='heart' size={18} color="#E02424" />)
+                                : (<Feather name='heart' size={18} color="#657786" />
 
-                            )}
+                                )}
                             <Text className={`text-sm ml-2 ${isLiked ? 'text-red-500' : 'text-gray-500'}`}>
                                 {formatNumber(post.likes?.length || 0)}
-                                </Text>
+                            </Text>
                         </TouchableOpacity>
                         <TouchableOpacity>
                             <Feather name='share' size={18} color="#657786" />

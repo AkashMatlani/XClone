@@ -55,6 +55,35 @@ const ProfileScreen = () => {
               <Feather name="check-circle" size={20} color="#1DA1F2" />
             </View>
             <Text className='text-gray-500 mb-2'>@{currentUser.username}</Text>
+            <Text className='text-gray-900 mb-3'>{currentUser.bio}</Text>
+
+            <View className='flex-row items-center mb-3'>
+              <Feather name="map-pin" size={16} color="#657786" />
+              <Text className='text-gray-500 ml-2'>{currentUser.location}</Text>
+            </View>
+            <View className='flex-row items-center mb-3'>
+              <Feather name="calendar" size={16} color="#657786" />
+              <Text className='text-blue-500 ml-2'>Joined March 2021</Text>
+            </View>
+
+            <View className='flex-row'>
+              <TouchableOpacity className='mr-6'>
+                <Text className='text-gray-900'>
+                  <Text className='font-bold'>{currentUser.following?.length}
+                  </Text>
+                  <Text className='text-gray-500 font-bold'>Following
+                  </Text>
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity >
+                <Text className='text-gray-900'>
+                  <Text className='font-bold'>{currentUser.followers?.length}
+                  </Text>
+                  <Text className='text-gray-500 font-bold'>Followers
+                  </Text>
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>

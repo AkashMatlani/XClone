@@ -3,6 +3,7 @@ import React from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import SignOutButton from '@/components/SignOutButton'
+import { Feather } from '@expo/vector-icons'
 
 const ProfileScreen = () => {
   const { currentUser, isLoading } = useCurrentUser();
@@ -38,16 +39,24 @@ const ProfileScreen = () => {
         <View className='px-4 pb-4 border-b border-gray-100'>
 
           <View className='flex-row justify-between items-end -mt-16 mb-4'>
-            <Image source={{ uri: currentUser.profilePicture || 'https://via.placeholder.com/150' }}    
+            <Image source={{ uri: currentUser.profilePicture || 'https://via.placeholder.com/150' }}
               className='w-32 h-32 rounded-full border-4 border-white'
             />
             <TouchableOpacity className='border border-gray-300 px-6 py-2 rounded-full'>
               <Text className='text-gray-900font-semibold'>Edit Profile</Text>
             </TouchableOpacity>
           </View>
+
+          <View className='mb-4'>
+            <View className='flex-row items-center mb-1'>
+              <Text className='text-xl font-bold text-gray-900 mr-1'>
+                {currentUser.firstName} {currentUser.lastName}
+              </Text>
+              <Feather name="check-circle" size={20} color="#1DA1F2" />
+            </View>
+            <Text className='text-gray-500 mb-2'>@{currentUser.username}</Text>
+          </View>
         </View>
-
-
       </ScrollView>
     </SafeAreaView>
   )

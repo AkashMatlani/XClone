@@ -12,7 +12,7 @@ export const usePosts = (username?:string) => {
         refetch
     } = useQuery({
         queryKey: username ? ["userPosts", username] : ["posts"],
-        queryFn: () => postApi.getPosts(api),
+        queryFn: () => (username ? postApi.getUserPosts(api, username) : postApi.getPosts(api)),
         select: (response) => response.data.posts,
     });
 
@@ -30,7 +30,6 @@ export const usePosts = (username?:string) => {
         mutationFn: (postId: string) => postApi.deletePost(api, postId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['posts'] });
-            queryClient.invalidateQueries({ queryKey: ['userPosts'] });
             if (username) {
                 queryClient.invalidateQueries({ queryKey: ['userPosts', username] });
             }

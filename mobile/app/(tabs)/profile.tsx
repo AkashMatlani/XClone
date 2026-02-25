@@ -12,7 +12,7 @@ const ProfileScreen = () => {
   const { currentUser, isLoading } = useCurrentUser();
   const insets = useSafeAreaInsets();
 
-  const { posts:userPosts, refetch:refetchPosts ,isLoading:isRefetching} = usePosts();
+  const { posts:userPosts, refetch:refetchPosts ,isLoading:isRefetching} = usePosts(currentUser?.username);
 
   if (isLoading) {
     return (
@@ -29,7 +29,7 @@ const ProfileScreen = () => {
         <View>
           <Text className='text-xl font-bold text-gray-900'>{currentUser.firstName} {currentUser.lastName}
           </Text>
-          <Text className='text-sm text-gray-500'>3 Posts</Text>
+          <Text className='text-sm text-gray-500'>{userPosts?.length || 0} Posts</Text>
         </View>
         <SignOutButton />
       </View>

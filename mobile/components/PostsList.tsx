@@ -10,10 +10,9 @@ const PostsList = ({ username }: { username?: string }) => {
     const { currentUser } = useCurrentUser();
     const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts(username);
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-
-    console.log('DEBUG: currentUser loaded?', !!currentUser, currentUser?._id);
-    console.log('DEBUG: posts count:', posts.length);
     const seletedPost = selectedPostId ? posts.find((post: Post) => post._id === selectedPostId) : null;
+    const selectedPost = selectedPostId ? posts.find((post: Post) => post._id === selectedPostId) : null;
+
 
     if (isLoading) {
         return (
@@ -35,7 +34,7 @@ const PostsList = ({ username }: { username?: string }) => {
         );
     }
 
-    if (posts.length === 0) {
+    if (!posts ||  posts.length === 0) {
         return (
             <View className='p-8 items-center'>
                 <Text className='text-gray-500'>No posts yet</Text>
@@ -46,20 +45,24 @@ const PostsList = ({ username }: { username?: string }) => {
     return (
         //fragment
         <>
-            {posts.map((post: Post) => (
-                <PostCard
-                    key={post._id}
-                    post={post}
-                    onLike={toggleLike}
-                    onDelete={deletePost}
-                    onComment={(post: Post) => setSelectedPostId(post._id)}
-                    currentUser={currentUser}
-                    isLiked={checkIsLiked(post?.likes, currentUser)}
+            {posts.map((post: Post) => {
+                const isLiked = currentUser ? checkIsLiked(post?.likes, currentUser) : false;
 
-                />
-            ))}
+                return (
+                    <PostCard
+                        key={post._id}
+                        post={post}
+                        onLike={toggleLike}
+                        onDelete={deletePost}
+                        onComment={(post: Post) => setSelectedPostId(post._id)}
+                        currentUser={currentUser}
+                        isLiked={isLiked}
+                    />
+                );
+            })}
 
             <CommentsModal seletedPost={seletedPost} onClose={() => setSelectedPostId(null)} />
+                
         </>
     )
 }

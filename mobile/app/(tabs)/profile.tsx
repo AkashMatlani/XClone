@@ -4,10 +4,15 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import SignOutButton from '@/components/SignOutButton'
 import { Feather } from '@expo/vector-icons'
+import { format } from 'date-fns'
+import { usePosts } from '@/hooks/usePosts'
+import PostsList from '@/components/PostsList'
 
 const ProfileScreen = () => {
   const { currentUser, isLoading } = useCurrentUser();
   const insets = useSafeAreaInsets();
+
+  const { posts:userPosts, refetch:refetchPosts ,isLoading:isRefetching} = usePosts();
 
   if (isLoading) {
     return (
@@ -63,7 +68,7 @@ const ProfileScreen = () => {
             </View>
             <View className='flex-row items-center mb-3'>
               <Feather name="calendar" size={16} color="#657786" />
-              <Text className='text-blue-500 ml-2'>Joined March 2021</Text>
+              <Text className='text-blue-500 ml-2'>Joined {format(new Date(currentUser.createdAt), 'MMMM yyyy')}</Text>
             </View>
 
             <View className='flex-row'>
@@ -71,7 +76,7 @@ const ProfileScreen = () => {
                 <Text className='text-gray-900'>
                   <Text className='font-bold'>{currentUser.following?.length}
                   </Text>
-                  <Text className='text-gray-500 font-bold'>Following
+                  <Text className='text-gray-500 font-bold'> Following
                   </Text>
                 </Text>
               </TouchableOpacity>
@@ -79,13 +84,14 @@ const ProfileScreen = () => {
                 <Text className='text-gray-900'>
                   <Text className='font-bold'>{currentUser.followers?.length}
                   </Text>
-                  <Text className='text-gray-500 font-bold'>Followers
+                  <Text className='text-gray-500 font-bold'> Followers
                   </Text>
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
+        <PostsList username={currentUser.username}/>
       </ScrollView>
     </SafeAreaView>
   )

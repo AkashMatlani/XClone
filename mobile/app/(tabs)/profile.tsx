@@ -7,12 +7,24 @@ import { Feather } from '@expo/vector-icons'
 import { format } from 'date-fns'
 import { usePosts } from '@/hooks/usePosts'
 import PostsList from '@/components/PostsList'
+import { useProfile } from '@/hooks/useProfile'
+import EditProfileModal from '@/components/EditProfileModal'
 
 const ProfileScreen = () => {
   const { currentUser, isLoading } = useCurrentUser();
   const insets = useSafeAreaInsets();
 
-  const { posts:userPosts, refetch:refetchPosts ,isLoading:isRefetching} = usePosts(currentUser?.username);
+  const { posts: userPosts, refetch: refetchPosts, isLoading: isRefetching } = usePosts(currentUser?.username);
+  const {
+    isEditModalVisible,
+    openEditModal,
+    closeEditModal,
+    formData,
+    saveProfile,
+    updateFormField,
+    isUpdating,
+    refetch: refetchProfile,
+  } = useProfile();
 
   if (isLoading) {
     return (
@@ -47,7 +59,8 @@ const ProfileScreen = () => {
             <Image source={{ uri: currentUser.profilePicture || 'https://via.placeholder.com/150' }}
               className='w-32 h-32 rounded-full border-4 border-white'
             />
-            <TouchableOpacity className='border border-gray-300 px-6 py-2 rounded-full'>
+            <TouchableOpacity className='border border-gray-300 px-6 py-2 rounded-full'
+            onPress={openEditModal}>
               <Text className='text-gray-900font-semibold'>Edit Profile</Text>
             </TouchableOpacity>
           </View>
@@ -91,8 +104,16 @@ const ProfileScreen = () => {
             </View>
           </View>
         </View>
-        <PostsList username={currentUser.username}/>
+        <PostsList username={currentUser.username} />
       </ScrollView>
+      <EditProfileModal
+        isVisible={isEditModalVisible}
+        onClose={closeEditModal}  
+        formData={formData}
+        saveProfile={saveProfile}
+        updateFormField={updateFormField}
+        isUpdating={isUpdating}
+        />
     </SafeAreaView>
   )
 }

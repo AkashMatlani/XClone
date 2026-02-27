@@ -1,32 +1,43 @@
-import { View, Text, Modal, TouchableOpacity } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React from 'react'
 
 
 interface EditProfileModalProps {
     isVisible: boolean;
-    onClose: () => void;    
+    onClose: () => void;
 
     formData: {
         firstName: string;
-        lastName: string;   
+        lastName: string;
         bio: string;
         location: string;
-    };  
+    };
     saveProfile: () => void;
     updateFormField: (field: string, value: string) => void;
     isUpdating: boolean;
 }
 const EditProfileModal = ({ isVisible, onClose, formData, updateFormField, saveProfile, isUpdating }: EditProfileModalProps) => {
 
-  return (
-    <Modal visible={isVisible} animationType="slide" presentationStyle="pageSheet">
-        <View className='flex-row items-center justify-between px-4 py-3 border-b border-gray-100'>
+    return (
+        <Modal visible={isVisible} animationType="slide" presentationStyle="pageSheet">
+            <View className='flex-row items-center justify-between px-4 py-3 border-b border-gray-100'>
                 <TouchableOpacity onPress={onClose}>
                     <Text className='text-blue-500 text-lg'>Cancel</Text>
                 </TouchableOpacity>
+                <Text className='text-lg font-semibold'>Edit Profile</Text>
+                <TouchableOpacity
+                    onPress={saveProfile}
+                    disabled={isUpdating}
+                    className={`${isUpdating ? 'opacity-50' : ''}`}
+                >
+                    {isUpdating ? (<ActivityIndicator size="small" color="#1DA1F2" />
+                    ) 
+                    :
+                    (<Text className='text-blue-500 text-lg font-semibold'>Save</Text>)}
+                </TouchableOpacity>
             </View>
-    </Modal>
-  )
+        </Modal>
+    )
 }
 
 export default EditProfileModal

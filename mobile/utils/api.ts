@@ -1,18 +1,21 @@
 import axios, { AxiosInstance } from "axios";
 import { useAuth } from "@clerk/clerk-expo";
+import type { GetToken } from "@clerk/types";
 
 //deployed at https://vercel.com/
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ||'https://x-clone-xi-lac.vercel.app/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://x-clone-xi-lac.vercel.app/api';
 
-export const createApiClient = (getToken: () => Promise<string | null>): AxiosInstance => {
+export const createApiClient = (getToken: GetToken): AxiosInstance => {
 
     const api = axios.create({ baseURL: API_BASE_URL });
     api.interceptors.request.use(async (config) => {
-        const token = await getToken();
+        const token = await getToken({ skipCache: true });
+
+        console.log("TOKEN:", token);
         console.log("Token used for sync:", token); // <--- check if null
 
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`
+            config.headers.Authorization = `Bearer ${token}`;
         }
         return config
     });

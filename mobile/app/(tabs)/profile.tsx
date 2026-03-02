@@ -35,7 +35,7 @@ const ProfileScreen = () => {
   }
 
   return (
-    <SafeAreaView className='flex-1'>
+    <SafeAreaView className='flex-1 bg-white' edges={['top']}>
       {/* Header */}
       <View className='flex-row items-center justify-between px-4 py-2 border-b border-gray-100'>
         <View>

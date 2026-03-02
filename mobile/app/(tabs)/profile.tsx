@@ -1,4 +1,4 @@
-import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
@@ -48,7 +48,17 @@ const ProfileScreen = () => {
 
       <ScrollView className='flex-1'
         contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={() => { 
+            refetchProfile();
+            refetchPosts(); 
+          }}
+          colors={["#1DA1F2"]}
+          tintColor="#1DA1F2"
+          />}>
         <Image source={{ uri: currentUser.profilePicture || 'https://via.placeholder.com/150' }}
           className='w-full h-48'
           resizeMode='cover'
@@ -60,7 +70,7 @@ const ProfileScreen = () => {
               className='w-32 h-32 rounded-full border-4 border-white'
             />
             <TouchableOpacity className='border border-gray-300 px-6 py-2 rounded-full'
-            onPress={openEditModal}>
+              onPress={openEditModal}>
               <Text className='text-gray-900font-semibold'>Edit Profile</Text>
             </TouchableOpacity>
           </View>
@@ -108,12 +118,12 @@ const ProfileScreen = () => {
       </ScrollView>
       <EditProfileModal
         isVisible={isEditModalVisible}
-        onClose={closeEditModal}  
+        onClose={closeEditModal}
         formData={formData}
         saveProfile={saveProfile}
         updateFormField={updateFormField}
         isUpdating={isUpdating}
-        />
+      />
     </SafeAreaView>
   )
 }
